@@ -1223,8 +1223,34 @@
       }, 40);
     }
 
+    let currentItemAudio = null;
+
+    function playMp3Audio(item) {
+      if (currentItemAudio) {
+        currentItemAudio.pause();
+        currentItemAudio.currentTime = 0;
+      }
+      const index = letters.indexOf(item);
+      if (index !== -1) {
+        const audioFile = `audio/${String(index + 1).padStart(2, "0")}.mp3`;
+        currentItemAudio = new Audio(audioFile);
+        currentItemAudio.volume = Number($("#volume").value || 1);
+        currentItemAudio.play().catch((err) => {
+          console.warn("Local MP3 audio play failed, falling back to TTS:", err);
+          speakTextOnly(speechText(item));
+        });
+      } else {
+        speakTextOnly(speechText(item));
+      }
+    }
+
     function speak(item, extra = "") {
-      speakTextOnly(`${speechText(item)} ${extra}`.trim());
+      playMp3Audio(item);
+      if (extra) {
+        setTimeout(() => {
+          speakTextOnly(extra);
+        }, 1200);
+      }
     }
 
     // --- 4. ระบบการเล่นอัตโนมัติ (Auto-Play System) ---
