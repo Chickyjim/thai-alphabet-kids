@@ -1,0 +1,1472 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ก ไก่ ถึง ฮ นกฮูก 🌟 เรียนรู้สนุกสำหรับเด็ก</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #243044;
+      --muted: #5e6b85;
+      --paper: #fffaf0;
+      --panel: #ffffff;
+      --line: #ebdcb9;
+      --sun: #ffd166;
+      --leaf: #4caf82;
+      --sky: #76b7f2;
+      --rose: #ff7aa8;
+      --plum: #7c5cff;
+      --orange: #ff9f43;
+      --good: #2e9d62;
+      --bad: #d64545;
+      --shadow: 0 16px 36px rgba(36, 48, 68, .08);
+      --font-kids: "Mali", "Tahoma", system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100svh;
+      color: var(--ink);
+      font-family: var(--font-kids);
+      background:
+        radial-gradient(circle at 15% 15%, rgba(255, 209, 102, .35), transparent 28rem),
+        radial-gradient(circle at 85% 10%, rgba(118, 183, 242, .3), transparent 26rem),
+        linear-gradient(180deg, #fff9ee 0%, #eefaff 100%);
+      overflow-x: hidden;
+    }
+
+    button, select {
+      font: inherit;
+    }
+
+    select, input[type="range"] {
+      accent-color: var(--plum);
+    }
+
+    .app {
+      width: min(1180px, calc(100% - 28px));
+      margin: 0 auto;
+      min-height: 100vh;
+      min-height: 100svh;
+      padding: 20px 0 32px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, auto);
+      gap: 16px;
+      align-items: end;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 3.6rem;
+      line-height: 1.15;
+      font-weight: 700;
+      color: var(--plum);
+      text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.8);
+    }
+
+    .subtitle {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 1.15rem;
+      font-weight: 500;
+    }
+
+    .sound-box {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .voice-select {
+      min-height: 46px;
+      max-width: 260px;
+      padding: 8px 12px;
+      border: 2px solid var(--line);
+      border-radius: 14px;
+      background: var(--panel);
+      color: var(--ink);
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+      transition: all 0.2s ease;
+    }
+
+    .voice-select:hover {
+      border-color: var(--plum);
+    }
+
+    .volume-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 46px;
+      padding: 8px 12px;
+      border: 2px solid var(--line);
+      border-radius: 14px;
+      background: var(--panel);
+      font-weight: 700;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+    }
+
+    .tabs, .toolbar, .actions, .answer-grid, .drop-grid, .letter-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .tab, .btn, .tile, .answer, .drop-zone, .drag-card {
+      border: 2px solid var(--line);
+      border-radius: 16px;
+      background: var(--panel);
+      color: var(--ink);
+      box-shadow: 0 6px 16px rgba(36, 48, 68, .06);
+      cursor: pointer;
+      transition: transform .25s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color .2s ease, background .2s ease, box-shadow .2s ease;
+    }
+
+    .tab, .btn {
+      min-height: 46px;
+      padding: 10px 16px;
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+
+    .tab[aria-selected="true"], .btn.primary {
+      background: var(--plum);
+      border-color: var(--plum);
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(124, 92, 255, 0.3);
+    }
+
+    .tab:hover, .btn:hover, .tile:hover, .answer:hover, .drag-card:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 10px 20px rgba(36, 48, 68, .12);
+    }
+
+    .tab:active, .btn:active, .tile:active, .answer:active, .drag-card:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .toolbar {
+      align-items: center;
+      justify-content: space-between;
+      margin: 20px 0;
+      padding: 14px 20px;
+      border: 2px dashed rgba(124, 92, 255, .32);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, .7);
+      backdrop-filter: blur(8px);
+    }
+
+    .toolbar h2 {
+      margin: 0;
+      font-size: 1.45rem;
+      font-weight: 700;
+    }
+
+    .score {
+      font-weight: 700;
+      color: var(--plum);
+      font-size: 1.3rem;
+      background: #f1edff;
+      padding: 4px 14px;
+      border-radius: 99px;
+      border: 1px solid rgba(124, 92, 255, 0.15);
+    }
+
+    main {
+      margin-top: 16px;
+    }
+
+    .mode {
+      display: none;
+    }
+
+    .mode.active {
+      display: block;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-card {
+      display: grid;
+      grid-template-columns: minmax(240px, 380px) minmax(0, 1fr);
+      gap: 26px;
+      align-items: center;
+      padding: 24px;
+      border-radius: 28px;
+      background: rgba(255, 255, 255, .82);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 2px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+
+    .letter-stage {
+      min-height: min(360px, calc(100svh - 260px));
+      display: grid;
+      place-items: center;
+      border-radius: 20px;
+      background:
+        linear-gradient(180deg, rgba(118, 183, 242, .26), rgba(255,255,255,.2) 45%),
+        linear-gradient(0deg, rgba(76, 175, 130, .26), transparent 38%);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .letter-stage::before {
+      content: "";
+      position: absolute;
+      left: 8%;
+      top: 8%;
+      width: 70px;
+      height: 70px;
+      border-radius: 999px;
+      background: var(--sun);
+      box-shadow: 0 0 0 16px rgba(255, 209, 102, .2);
+    }
+
+    .big-picture {
+      position: relative;
+      z-index: 1;
+      width: min(92%, 330px);
+      aspect-ratio: 1 / 1;
+      border: 8px solid #fff;
+      border-radius: 20px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 16px 32px rgba(36, 48, 68, .15);
+      transform-origin: center bottom;
+      animation: bounce .9s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .big-picture .photo-crop, .card-picture, .question-picture, .drop-picture {
+      width: 100%;
+      display: block;
+      aspect-ratio: 1 / 1;
+      background-repeat: no-repeat;
+      background-size: 200% 200%;
+      background-color: #f7f3e8;
+      background-clip: padding-box;
+    }
+
+    .big-picture .photo-crop {
+      height: 100%;
+    }
+
+    @keyframes bounce {
+      0% { transform: translateY(20px) scale(.88); }
+      55% { transform: translateY(-12px) scale(1.04); }
+      100% { transform: translateY(0) scale(1); }
+    }
+
+    .letter-info {
+      display: grid;
+      gap: 12px;
+    }
+
+    .big-letter {
+      font-size: 9.5rem;
+      line-height: .85;
+      font-weight: 700;
+      color: var(--rose);
+      text-shadow: 4px 4px 0 rgba(255, 209, 102, .75);
+    }
+
+    .word {
+      margin: 0;
+      font-size: 3.6rem;
+      line-height: 1.15;
+      font-weight: 700;
+    }
+
+    .hint {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+
+    .letter-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      margin-top: 20px;
+    }
+
+    .tile {
+      min-height: 90px;
+      padding: 8px;
+      display: grid;
+      place-items: center;
+      gap: 3px;
+      border-radius: 14px;
+    }
+
+    .tile.active {
+      border-color: var(--rose);
+      background: #fff0f6;
+      box-shadow: 0 4px 12px rgba(255, 122, 168, 0.2);
+    }
+
+    .tile-letter {
+      font-size: 2.6rem;
+      line-height: 1;
+      font-weight: 700;
+    }
+
+    .tile-word {
+      color: var(--muted);
+      font-size: .92rem;
+      line-height: 1.1;
+      font-weight: 500;
+    }
+
+    .flash-wrap {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 16px;
+    }
+
+    .flash-card {
+      min-height: 240px;
+      padding: 12px;
+      border-radius: 20px;
+      border: 2px solid var(--line);
+      background: var(--panel);
+      box-shadow: 0 8px 18px rgba(36, 48, 68, .08);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      place-items: center;
+      text-align: center;
+      gap: 8px;
+    }
+
+    .flash-letter {
+      font-size: 4.4rem;
+      line-height: 1;
+      color: var(--plum);
+      font-weight: 700;
+    }
+
+    .card-picture {
+      width: min(100%, 154px);
+      overflow: hidden;
+      border-radius: 14px;
+      background-color: #f7f3e8;
+      border: 2px solid rgba(229, 216, 191, .8);
+      justify-self: center;
+    }
+
+    .flash-word {
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+
+    .game-board {
+      display: grid;
+      grid-template-columns: minmax(220px, 340px) minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .question-card {
+      padding: 20px;
+      border-radius: 24px;
+      background: var(--panel);
+      border: 2px solid var(--line);
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .question-picture {
+      width: min(100%, 230px);
+      overflow: hidden;
+      border-radius: 18px;
+      background-color: #f7f3e8;
+      border: 2px solid rgba(229, 216, 191, .8);
+      margin: 0 auto 14px;
+      animation: pop 0.4s ease-out;
+    }
+
+    .question-card .word {
+      font-size: 1.7rem;
+      line-height: 1.3;
+      margin-bottom: 12px;
+    }
+
+    .answer-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(130px, 1fr));
+      gap: 14px;
+    }
+
+    .answer {
+      min-height: 154px;
+      padding: 14px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      gap: 8px;
+      font-weight: 700;
+      border-radius: 20px;
+    }
+
+    .answer-letter {
+      font-size: 5.8rem;
+      line-height: 1;
+      color: var(--plum);
+      font-weight: 700;
+    }
+
+    .answer.correct {
+      border-color: var(--good);
+      background: #eafff2;
+      animation: pop 0.5s ease-out;
+    }
+
+    .answer.wrong {
+      border-color: var(--bad);
+      background: #fff0f0;
+      animation: shake 0.4s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+
+    .drag-layout {
+      display: grid;
+      grid-template-columns: minmax(260px, .85fr) minmax(0, 1.15fr);
+      gap: 18px;
+    }
+
+    .drag-pool, .drop-grid {
+      min-height: 340px;
+      padding: 16px;
+      border-radius: 22px;
+      border: 2px solid var(--line);
+      background: rgba(255, 255, 255, .72);
+      backdrop-filter: blur(4px);
+    }
+
+    .drag-pool {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+      align-content: start;
+      gap: 12px;
+    }
+
+    .drop-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+    }
+
+    .drag-card {
+      min-height: 96px;
+      padding: 10px;
+      display: grid;
+      place-items: center;
+      font-size: 3.4rem;
+      font-weight: 700;
+      color: var(--plum);
+      touch-action: none;
+      user-select: none;
+      border-radius: 16px;
+    }
+
+    .drag-card.used {
+      opacity: .3;
+      cursor: default;
+      box-shadow: none;
+      transform: none;
+      pointer-events: none;
+    }
+
+    .drag-card.active {
+      border-color: var(--rose);
+      background: #fff0f6;
+      transform: scale(1.1) translateY(-2px);
+      box-shadow: 0 8px 24px rgba(255, 122, 168, 0.3);
+      animation: pulse 1.2s infinite alternate;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1.04) translateY(-2px); }
+      100% { transform: scale(1.12) translateY(-4px); }
+    }
+
+    .drop-zone {
+      min-height: 220px;
+      padding: 12px;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto auto;
+      place-items: center;
+      text-align: center;
+      gap: 6px;
+      cursor: default;
+      border-radius: 18px;
+    }
+
+    .drop-zone.over {
+      border-color: var(--sky);
+      background: #eef8ff;
+      transform: scale(1.03);
+    }
+
+    .drop-zone.done {
+      border-color: var(--good);
+      background: #effff5;
+      animation: pop 0.4s ease-out;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+
+    .drop-picture {
+      width: min(100%, 150px);
+      overflow: hidden;
+      border-radius: 14px;
+      background-color: #f7f3e8;
+      border: 2px solid rgba(229, 216, 191, .8);
+    }
+
+    .drop-label {
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+
+    .placed {
+      color: var(--good);
+      font-size: 2.5rem;
+      font-weight: 700;
+    }
+
+    .feedback {
+      min-height: 32px;
+      margin-top: 14px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--plum);
+      text-shadow: 1px 1px 0px white;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Progress bar styles */
+    .progress-bar-bg {
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    @media (max-width: 1024px) {
+      h1 {
+        font-size: 2.9rem;
+      }
+
+      .word {
+        font-size: 3rem;
+      }
+
+      .big-letter {
+        font-size: 8rem;
+      }
+
+      .question-picture {
+        width: min(70vw, 230px);
+      }
+    }
+
+    @media (max-width: 820px) {
+      header, .hero-card, .game-board, .drag-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sound-box {
+        justify-content: flex-start;
+      }
+
+      .answer-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .letter-stage {
+        min-height: 300px;
+      }
+
+      .big-picture {
+        width: min(70vw, 300px);
+      }
+    }
+
+    @media (max-width: 470px) {
+      .app {
+        width: min(100% - 16px, 1180px);
+        padding-top: 12px;
+      }
+
+      header {
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+
+      h1 {
+        font-size: 2.2rem;
+      }
+
+      .subtitle, .hint {
+        font-size: 1rem;
+      }
+
+      .toolbar {
+        gap: 8px;
+        padding: 10px;
+      }
+
+      .toolbar h2 {
+        font-size: 1.15rem;
+      }
+
+      .tab, .btn {
+        flex: 1 1 auto;
+        padding-inline: 10px;
+      }
+
+      .voice-select, .volume-control {
+        width: 100%;
+        max-width: none;
+      }
+
+      .hero-card {
+        padding: 14px;
+        gap: 14px;
+      }
+
+      .letter-stage {
+        min-height: 230px;
+      }
+
+      .big-picture {
+        width: min(78vw, 230px);
+        border-width: 6px;
+      }
+
+      .big-letter {
+        font-size: 5.5rem;
+      }
+
+      .word {
+        font-size: 2.2rem;
+      }
+
+      .question-card .word {
+        font-size: 1.35rem;
+      }
+
+      .flash-wrap {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .flash-card {
+        min-height: 200px;
+        padding: 10px;
+        border-radius: 16px;
+      }
+
+      .flash-letter {
+        font-size: 3.5rem;
+      }
+
+      .card-picture {
+        width: min(100%, 130px);
+      }
+
+      .answer {
+        min-height: 128px;
+        padding: 10px;
+        border-radius: 16px;
+      }
+
+      .answer-letter {
+        font-size: 4.6rem;
+      }
+
+      .drag-pool {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .drop-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .drop-zone {
+        min-height: 180px;
+        padding: 8px;
+        border-radius: 16px;
+      }
+
+      .drop-picture {
+        width: min(100%, 118px);
+      }
+
+      .letter-grid {
+        grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+      }
+    }
+
+    @media (max-width: 360px) {
+      .flash-wrap, .answer-grid, .drop-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card-picture, .question-picture, .drop-picture {
+        width: min(100%, 150px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Canvas สำหรับเอฟเฟกต์กระดาษสีฉลองชัยชนะ (Confetti) -->
+  <canvas id="confetti-canvas" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999; display: block;"></canvas>
+
+  <div class="app">
+    <header>
+      <div>
+        <h1>ก ไก่ ถึง ฮ นกฮูก</h1>
+        <p class="subtitle">สื่อเรียนรู้ตัวอักษรไทยสำหรับเด็ก 4 ขวบ พร้อมภาพ เสียง และเกมสนุก ๆ</p>
+      </div>
+      <div class="sound-box">
+        <select class="voice-select" id="voice-select" aria-label="เลือกเสียงอ่าน">
+          <option value="">กำลังโหลดเสียง...</option>
+        </select>
+        <label class="volume-control" for="volume">เสียง
+          <input id="volume" type="range" min="0" max="1" step="0.05" value="1">
+        </label>
+        <button class="btn" id="unlock-sound" type="button">ทดสอบเสียง</button>
+        <button class="btn primary" id="speak-current" type="button">ฟังเสียง</button>
+        <button class="btn" id="random-letter" type="button">สุ่มตัวอักษร</button>
+      </div>
+    </header>
+
+    <nav class="tabs" aria-label="เลือกกิจกรรม">
+      <button class="tab" type="button" data-mode="learn" aria-selected="true">กดดูภาพ</button>
+      <button class="tab" type="button" data-mode="cards" aria-selected="false">บัตรคำ</button>
+      <button class="tab" type="button" data-mode="match" aria-selected="false">เกมจับคู่</button>
+      <button class="tab" type="button" data-mode="drag" aria-selected="false">ลากวาง</button>
+    </nav>
+
+    <main>
+      <section id="learn" class="mode active" aria-labelledby="learn-title">
+        <h2 id="learn-title" class="sr-only">กดตัวอักษรเพื่อดูภาพและฟังเสียง</h2>
+        <div class="hero-card">
+          <div class="letter-stage" aria-hidden="true">
+            <div class="big-picture" id="main-picture">
+              <div id="main-img" class="photo-crop" role="img" aria-label=""></div>
+            </div>
+          </div>
+          <div class="letter-info">
+            <div class="big-letter" id="main-letter">ก</div>
+            <p class="word" id="main-word">ก ไก่</p>
+            <p class="hint" id="main-hint">แตะตัวอักษรด้านล่าง หรือกดฟังเสียงเพื่อทบทวน ภาพเป็นรูปถ่ายจริง</p>
+            
+            <!-- แถบโปรเกรสบาร์ความคืบหน้าการกดเรียนรู้ -->
+            <div class="progress-container" style="margin: 8px 0 16px;">
+              <div class="progress-bar-bg" style="height: 12px; background: rgba(0,0,0,0.06); border-radius: 99px; overflow: hidden; position: relative;">
+                <div id="learn-progress" style="width: 2.27%; height: 100%; background: linear-gradient(90deg, var(--rose), var(--plum)); border-radius: 99px; transition: width 0.3s ease;"></div>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 0.9rem; font-weight: 700; color: var(--muted);">
+                <span>เริ่มเรียนรู้ 🌟</span>
+                <span id="learn-progress-text">ก (1/44)</span>
+                <span>สำเร็จ! 🏆</span>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn primary" id="next-letter" type="button">ตัวถัดไป</button>
+              <button class="btn" id="prev-letter" type="button">ตัวย้อนกลับ</button>
+              <button class="btn" id="auto-play" type="button" style="border-color: var(--orange); color: var(--orange);">▶️ เล่นอัตโนมัติ</button>
+            </div>
+          </div>
+        </div>
+        <div class="letter-grid" id="letter-grid"></div>
+      </section>
+
+      <section id="cards" class="mode" aria-labelledby="cards-title">
+        <div class="toolbar">
+          <h2 id="cards-title">บัตรคำ 44 ตัว</h2>
+          <button class="btn" id="speak-all-tip" type="button">ฟังตัวที่เลือก</button>
+        </div>
+        <div class="flash-wrap" id="flash-wrap"></div>
+      </section>
+
+      <section id="match" class="mode" aria-labelledby="match-title">
+        <div class="toolbar">
+          <h2 id="match-title">เกมดูภาพแล้วเลือกตัวอักษร</h2>
+          <div class="score" id="match-score">คะแนน 0</div>
+        </div>
+        <div class="game-board">
+          <div class="question-card">
+            <div id="question-picture" class="question-picture" role="img" aria-label=""></div>
+            <p class="word" id="question-word">ชื่อตัวอักษรของภาพนี้ คือข้อใด</p>
+            <button class="btn primary" id="speak-question" type="button">ฟังโจทย์</button>
+            <div class="feedback" id="match-feedback" aria-live="polite"></div>
+          </div>
+          <div class="answer-grid" id="answer-grid"></div>
+        </div>
+      </section>
+
+      <section id="drag" class="mode" aria-labelledby="drag-title">
+        <div class="toolbar">
+          <h2 id="drag-title">ลากตัวอักษรไปวางบนภาพ</h2>
+          <div class="actions">
+            <div class="score" id="drag-score">ถูก 0 จาก 6</div>
+            <button class="btn" id="new-drag" type="button">ชุดใหม่</button>
+          </div>
+        </div>
+        <div class="drag-layout">
+          <div>
+            <h3>ตัวอักษร</h3>
+            <div class="drag-pool" id="drag-pool"></div>
+          </div>
+          <div>
+            <h3>ภาพ</h3>
+            <div class="drop-grid" id="drop-grid"></div>
+          </div>
+        </div>
+        <div class="feedback" id="drag-feedback" aria-live="polite"></div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const letters = [
+      { l: "ก", w: "ไก่", e: "🐔", q: "chicken animal real photo" },
+      { l: "ข", w: "ไข่", e: "🥚", q: "chicken egg real photo" },
+      { l: "ฃ", w: "ขวด", e: "🍼", q: "glass bottle real photo" },
+      { l: "ค", w: "ควาย", e: "🐃", q: "water buffalo animal real photo" },
+      { l: "ฅ", w: "คน", e: "🧒", q: "person portrait real photo" },
+      { l: "ฆ", w: "ระฆัง", e: "🔔", q: "large bronze bell real photo" },
+      { l: "ง", w: "งู", e: "🐍", q: "snake animal real photo" },
+      { l: "จ", w: "จาน", e: "🍽️", q: "ceramic plate real photo" },
+      { l: "ฉ", w: "ฉิ่ง", e: "🎶", q: "Thai finger cymbals real photo" },
+      { l: "ช", w: "ช้าง", e: "🐘", q: "elephant animal real photo" },
+      { l: "ซ", w: "โซ่", e: "⛓️", q: "metal chain real photo" },
+      { l: "ฌ", w: "เฌอ", e: "🌳", q: "green tree real photo" },
+      { l: "ญ", w: "หญิง", e: "👧", q: "woman portrait real photo" },
+      { l: "ฎ", w: "ชฎา", e: "👑", q: "Thai chada headdress real photo" },
+      { l: "ฏ", w: "ปฏัก", e: "🪄", q: "elephant goad bullhook real photo" },
+      { l: "ฐ", w: "ฐาน", e: "🧱", q: "stone pedestal base real photo" },
+      { l: "ฑ", w: "มณโฑ", e: "👸", q: "Thai classical woman costume real photo" },
+      { l: "ฒ", w: "ผู้เฒ่า", e: "👴", q: "elderly person portrait real photo" },
+      { l: "ณ", w: "เณร", e: "🧑‍🦲", q: "Buddhist novice monk real photo" },
+      { l: "ด", w: "เด็ก", e: "🧒", q: "child portrait real photo" },
+      { l: "ต", w: "เต่า", e: "🐢", q: "turtle animal real photo" },
+      { l: "ถ", w: "ถุง", e: "🛍️", q: "cloth bag real photo" },
+      { l: "ท", w: "ทหาร", e: "🪖", q: "soldier uniform real photo" },
+      { l: "ธ", w: "ธง", e: "🚩", q: "colorful flag real photo" },
+      { l: "น", w: "หนู", e: "🐭", q: "mouse animal real photo" },
+      { l: "บ", w: "ใบไม้", e: "🍃", q: "green leaf real photo" },
+      { l: "ป", w: "ปลา", e: "🐟", q: "fish animal real photo" },
+      { l: "ผ", w: "ผึ้ง", e: "🐝", q: "honey bee real photo" },
+      { l: "ฝ", w: "ฝา", e: "🫙", q: "jar lid real photo" },
+      { l: "พ", w: "พาน", e: "🏆", q: "Thai ceremonial pedestal tray real photo" },
+      { l: "ฟ", w: "ฟัน", e: "🦷", q: "human tooth real photo" },
+      { l: "ภ", w: "สำเภา", e: "⛵", q: "Chinese junk sailing boat real photo" },
+      { l: "ม", w: "ม้า", e: "🐴", q: "horse animal real photo" },
+      { l: "ย", w: "ยักษ์", e: "👹", q: "Thai yaksha giant statue real photo" },
+      { l: "ร", w: "เรือ", e: "🚤", q: "boat on water real photo" },
+      { l: "ล", w: "ลิง", e: "🐵", q: "monkey animal real photo" },
+      { l: "ว", w: "แหวน", e: "💍", q: "ring jewelry real photo" },
+      { l: "ศ", w: "ศาลา", e: "🏛️", q: "Thai pavilion real photo" },
+      { l: "ษ", w: "ฤๅษี", e: "🧙", q: "Thai hermit rishi statue real photo" },
+      { l: "ส", w: "เสือ", e: "🐯", q: "tiger animal real photo" },
+      { l: "ห", w: "หีบ", e: "📦", q: "wooden treasure chest real photo" },
+      { l: "ฬ", w: "จุฬา", e: "🪁", q: "Thai kite real photo" },
+      { l: "อ", w: "อ่าง", e: "🛁", q: "wash basin bowl real photo" },
+      { l: "ฮ", w: "นกฮูก", e: "🦉", q: "owl animal real photo" }
+    ];
+
+    const $ = (selector) => document.querySelector(selector);
+    const $$ = (selector) => Array.from(document.querySelectorAll(selector));
+    let current = 0;
+    let matchQuestion = null;
+    let matchScore = 0;
+    let dragSet = [];
+    let dragDone = 0;
+    let selectedDragLetter = "";
+    let availableVoices = [];
+    let selectedVoiceName = "";
+    let autoPlayInterval = null;
+
+    // --- 1. ระบบเอฟเฟกต์เสียงสังเคราะห์ (Web Audio API Synthesizer) ---
+    const AudioSynth = {
+      ctx: null,
+      
+      init() {
+        if (this.ctx) return;
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) {
+          this.ctx = new AudioContext();
+        }
+      },
+      
+      playTone(freq, duration, type = "sine", startOffset = 0, endOffset = 0) {
+        this.init();
+        if (!this.ctx) return;
+        
+        if (this.ctx.state === "suspended") {
+          this.ctx.resume();
+        }
+        
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime + startOffset);
+        
+        const maxVol = Number($("#volume").value || 1) * 0.15;
+        gain.gain.setValueAtTime(maxVol, this.ctx.currentTime + startOffset);
+        
+        if (endOffset > startOffset) {
+          // สไลด์ความถี่เสียงลง (กรณีตอบผิด)
+          osc.frequency.exponentialRampToValueAtTime(freq * 0.5, this.ctx.currentTime + endOffset);
+          gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + endOffset);
+        } else {
+          gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + startOffset + duration);
+        }
+        
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(this.ctx.currentTime + startOffset);
+        osc.stop(this.ctx.currentTime + Math.max(startOffset + duration, endOffset));
+      },
+
+      playSuccess() {
+        // โน้ตใส ๆ ไล่ระดับขึ้น (C5 -> E5 -> G5 -> C6)
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, idx) => {
+          this.playTone(freq, 0.12, "sine", idx * 0.07);
+        });
+      },
+
+      playFailure() {
+        // เสียงหึ่งต่ำลากสไลด์ลงสั้น ๆ (Sawtooth slide)
+        this.init();
+        if (!this.ctx) return;
+        if (this.ctx.state === "suspended") this.ctx.resume();
+        
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = "sawtooth";
+        
+        const baseFreq = 180;
+        osc.frequency.setValueAtTime(baseFreq, this.ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(90, this.ctx.currentTime + 0.35);
+        
+        const maxVol = Number($("#volume").value || 1) * 0.12;
+        gain.gain.setValueAtTime(maxVol, this.ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.35);
+        
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.35);
+      },
+
+      playVictory() {
+        // ทำนองยินดีสั้น ๆ แสดงความฉลองผ่านด่าน
+        const notes = [523.25, 523.25, 659.25, 783.99, 1046.50];
+        const times = [0, 0.12, 0.24, 0.36, 0.48];
+        const durs = [0.1, 0.1, 0.1, 0.1, 0.5];
+        notes.forEach((freq, idx) => {
+          this.playTone(freq, durs[idx], "sine", times[idx]);
+        });
+      }
+    };
+
+    // --- 2. ระบบพลุกระดาษสีเฉลิมฉลอง (Canvas Confetti Engine) ---
+    const Confetti = {
+      canvas: null,
+      ctx: null,
+      particles: [],
+      animationId: null,
+      colors: ["#ffd166", "#4caf82", "#76b7f2", "#ff7aa8", "#7c5cff", "#ff9f43"],
+
+      init() {
+        this.canvas = document.getElementById("confetti-canvas");
+        this.ctx = this.canvas.getContext("2d");
+        this.resize();
+        window.removeEventListener("resize", this.resizeBind);
+        this.resizeBind = () => this.resize();
+        window.addEventListener("resize", this.resizeBind);
+      },
+
+      resize() {
+        if (this.canvas) {
+          this.canvas.width = window.innerWidth;
+          this.canvas.height = window.innerHeight;
+        }
+      },
+
+      spawn(count = 100) {
+        this.init();
+        if (this.animationId) {
+          cancelAnimationFrame(this.animationId);
+          this.animationId = null;
+        }
+        // สุ่มอนุภาคกระดาษสี
+        for (let i = 0; i < count; i++) {
+          this.particles.push({
+            x: Math.random() * this.canvas.width,
+            y: Math.random() * -this.canvas.height - 20,
+            size: Math.random() * 8 + 8,
+            color: this.colors[Math.floor(Math.random() * this.colors.length)],
+            speedX: Math.random() * 6 - 3,
+            speedY: Math.random() * 5 + 4,
+            rotation: Math.random() * 360,
+            rotationSpeed: Math.random() * 6 - 3
+          });
+        }
+        this.animate();
+      },
+
+      animate() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        let active = false;
+
+        this.particles.forEach((p, index) => {
+          p.y += p.speedY;
+          p.x += p.speedX;
+          p.rotation += p.rotationSpeed;
+
+          this.ctx.save();
+          this.ctx.translate(p.x, p.y);
+          this.ctx.rotate((p.rotation * Math.PI) / 180);
+          this.ctx.fillStyle = p.color;
+          this.ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+          this.ctx.restore();
+
+          if (p.y < this.canvas.height) {
+            active = true;
+          } else {
+            // ลบตัวที่ตกร่วงจอไปแล้วออกเพื่อประหยัด RAM
+            this.particles.splice(index, 1);
+          }
+        });
+
+        if (active && this.particles.length > 0) {
+          this.animationId = requestAnimationFrame(() => this.animate());
+        } else {
+          this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+          this.particles = [];
+          this.animationId = null;
+        }
+      }
+    };
+
+    // --- 3. ตรรกะแอปพลิเคชันพื้นฐานและเสียงอ่าน (TTS) ---
+    function shuffle(items) {
+      return [...items].sort(() => Math.random() - 0.5);
+    }
+
+    function speechText(item) {
+      return `${item.l} ${item.w}`;
+    }
+
+    function photoData(item) {
+      const index = letters.indexOf(item);
+      const sprite = Math.floor(index / 4) + 1;
+      const cell = index % 4;
+      return {
+        file: `alphabet-real-${String(sprite).padStart(2, "0")}.png`,
+        position: `${cell % 2 ? 100 : 0}% ${cell > 1 ? 100 : 0}%`
+      };
+    }
+
+    function applyPhoto(element, item) {
+      const photo = photoData(item);
+      element.style.backgroundImage = `url("${photo.file}")`;
+      element.style.backgroundPosition = photo.position;
+      element.setAttribute("aria-label", `${item.w} รูปถ่ายจริง`);
+    }
+
+    function pictureHtml(item, className) {
+      const photo = photoData(item);
+      return `
+        <div class="${className}" role="img" aria-label="${item.w} รูปถ่ายจริง" style="background-image:url('${photo.file}');background-position:${photo.position}"></div>
+      `;
+    }
+
+    function loadVoices() {
+      if (!("speechSynthesis" in window)) {
+        $("#voice-select").innerHTML = `<option value="__online_thai__">เสียงไทยออนไลน์</option>`;
+        selectedVoiceName = "__online_thai__";
+        return;
+      }
+      availableVoices = window.speechSynthesis.getVoices();
+      const thaiVoices = availableVoices.filter((voice) => voice.lang.toLowerCase().startsWith("th"));
+      const preferred = thaiVoices[0] || availableVoices.find((voice) => voice.lang.toLowerCase().startsWith("en")) || availableVoices[0];
+      selectedVoiceName = selectedVoiceName || (preferred ? preferred.name : "");
+      if (!thaiVoices.length) selectedVoiceName = "__online_thai__";
+      const onlineOption = `<option value="__online_thai__" ${selectedVoiceName === "__online_thai__" ? "selected" : ""}>เสียงไทยออนไลน์ (แนะนำ)</option>`;
+      const voiceOptions = availableVoices.map((voice) => `<option value="${voice.name}" ${voice.name === selectedVoiceName ? "selected" : ""}>${voice.name} (${voice.lang})</option>`).join("");
+      $("#voice-select").innerHTML = onlineOption + voiceOptions;
+    }
+
+    function onlineThaiUrl(text) {
+      return `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=th&q=${encodeURIComponent(text)}`;
+    }
+
+    function speakOnlineThai(text) {
+      window.speechSynthesis?.cancel();
+      const audio = new Audio(onlineThaiUrl(text));
+      audio.volume = Number($("#volume").value || 1);
+      audio.onerror = () => {
+        $("#main-hint").textContent = "เสียงไทยออนไลน์เล่นไม่ได้ อาจต้องเชื่อมต่ออินเทอร์เน็ต หรือลองเปิดด้วย Chrome/Edge";
+      };
+      audio.play().catch(() => {
+        $("#main-hint").textContent = "กดปุ่มทดสอบเสียงหรือฟังเสียงอีกครั้ง เพื่ออนุญาตให้เบราว์เซอร์เล่นเสียง";
+      });
+    }
+
+    function speakTextOnly(text) {
+      if (!availableVoices.length) loadVoices();
+      if (selectedVoiceName === "__online_thai__") {
+        speakOnlineThai(text);
+        return;
+      }
+      if (!("speechSynthesis" in window)) {
+        speakOnlineThai(text);
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      const voice = availableVoices.find((entry) => entry.name === selectedVoiceName)
+        || availableVoices.find((entry) => entry.lang.toLowerCase().startsWith("th"));
+      if (voice) utterance.voice = voice;
+      utterance.lang = "th-TH";
+      utterance.rate = 0.78;
+      utterance.pitch = 1.08;
+      utterance.volume = Number($("#volume").value || 1);
+      utterance.onerror = () => {
+        $("#main-hint").textContent = "ยังไม่ได้ยินเสียง ลองเลือกเสียงอื่น หรือเพิ่มเสียงภาษาไทยในระบบ/เบราว์เซอร์";
+      };
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function speak(item, extra = "") {
+      speakTextOnly(`${speechText(item)} ${extra}`.trim());
+    }
+
+    // --- 4. ระบบการเล่นอัตโนมัติ (Auto-Play System) ---
+    function toggleAutoPlay() {
+      const btn = $("#auto-play");
+      AudioSynth.init();
+      if (autoPlayInterval) {
+        stopAutoPlay();
+      } else {
+        btn.innerHTML = "⏸️ หยุดอัตโนมัติ";
+        btn.classList.add("primary");
+        btn.style.borderColor = "var(--plum)";
+        btn.style.color = "#fff";
+        // ตั้งช่วงเวลาเปลี่ยนหน้าทุก ๆ 4.5 วินาที
+        autoPlayInterval = setInterval(() => {
+          setCurrent(current + 1, true, true);
+        }, 4500);
+        // สั่งให้อ่านคำปัจจุบันทันที
+        speak(letters[current]);
+      }
+    }
+
+    function stopAutoPlay() {
+      if (autoPlayInterval) {
+        clearInterval(autoPlayInterval);
+        autoPlayInterval = null;
+      }
+      const btn = $("#auto-play");
+      if (btn) {
+        btn.innerHTML = "▶️ เล่นอัตโนมัติ";
+        btn.classList.remove("primary");
+        btn.style.borderColor = "var(--orange)";
+        btn.style.color = "var(--orange)";
+      }
+    }
+
+    function setCurrent(index, shouldSpeak = true, isAuto = false) {
+      // ถ้ากดเปลี่ยนตัวอักษรเองแบบแมนนวล ให้ปิดการเล่นอัตโนมัติทันที
+      if (!isAuto) {
+        stopAutoPlay();
+      }
+      current = (index + letters.length) % letters.length;
+      const item = letters[current];
+      applyPhoto($("#main-img"), item);
+      $("#main-picture").style.animation = "none";
+      void $("#main-picture").offsetWidth;
+      $("#main-picture").style.animation = "";
+      $("#main-letter").textContent = item.l;
+      $("#main-word").textContent = speechText(item);
+      $$(".tile").forEach((button) => button.classList.toggle("active", Number(button.dataset.index) === current));
+      
+      // อัปเดตแถบความคืบหน้าการกดดูภาพ (Progress Bar)
+      const progressPercent = ((current + 1) / letters.length) * 100;
+      $("#learn-progress").style.width = `${progressPercent}%`;
+      $("#learn-progress-text").textContent = `${item.l} (${current + 1}/${letters.length})`;
+
+      if (shouldSpeak) speak(item);
+    }
+
+    function renderLetterGrid() {
+      $("#letter-grid").innerHTML = letters.map((item, index) => `
+        <button class="tile" type="button" data-index="${index}" aria-label="${speechText(item)}">
+          <span class="tile-letter">${item.l}</span>
+          <span class="tile-word">${item.w}</span>
+        </button>
+      `).join("");
+      $$(".tile").forEach((button) => {
+        button.addEventListener("click", () => setCurrent(Number(button.dataset.index)));
+      });
+    }
+
+    function renderCards() {
+      $("#flash-wrap").innerHTML = letters.map((item, index) => `
+        <button class="flash-card" type="button" data-card="${index}" aria-label="ฟังเสียง ${speechText(item)}">
+          <div class="flash-letter">${item.l}</div>
+          ${pictureHtml(item, "card-picture")}
+          <div class="flash-word">${speechText(item)}</div>
+        </button>
+      `).join("");
+      $$(".flash-card").forEach((card) => {
+        card.addEventListener("click", () => {
+          const index = Number(card.dataset.card);
+          setCurrent(index, false);
+          speak(letters[index]);
+        });
+      });
+    }
+
+    // --- 5. เกมดูภาพเลือกตัวอักษร ---
+    function nextMatch() {
+      const correct = letters[Math.floor(Math.random() * letters.length)];
+      const choices = shuffle([
+        correct,
+        ...shuffle(letters.filter((item) => item !== correct)).slice(0, 3)
+      ]);
+      matchQuestion = correct;
+      applyPhoto($("#question-picture"), correct);
+      $("#question-word").textContent = "ชื่อตัวอักษรของภาพนี้ คือข้อใด";
+      $("#match-feedback").textContent = "";
+      $("#answer-grid").innerHTML = choices.map((item) => `
+        <button class="answer" type="button" data-letter="${item.l}" aria-label="ตัวอักษร ${item.l}">
+          <span class="answer-letter">${item.l}</span>
+        </button>
+      `).join("");
+      $$(".answer").forEach((button) => {
+        button.addEventListener("click", () => checkMatch(button));
+      });
+      speakTextOnly("ชื่อตัวอักษรของภาพนี้ คือข้อใด");
+    }
+
+    function checkMatch(button) {
+      const isCorrect = button.dataset.letter === matchQuestion.l;
+      button.classList.add(isCorrect ? "correct" : "wrong");
+      if (isCorrect) {
+        matchScore += 1;
+        $("#match-score").textContent = `คะแนน ${matchScore}`;
+        $("#match-feedback").textContent = `🎉 เก่งมากเลย! ${speechText(matchQuestion)}`;
+        
+        AudioSynth.playSuccess(); // เสียงเอฟเฟกต์ตอบถูก
+        Confetti.spawn(40); // พ่นกระดาษสี 40 ชิ้น
+        
+        speak(matchQuestion, "ถูกต้อง");
+        setTimeout(nextMatch, 1200);
+      } else {
+        AudioSynth.playFailure(); // เสียงเอฟเฟกต์ตอบผิด
+        $("#match-feedback").textContent = "❌ ยังไม่ใช่จ้า... ลองอีกรอบนะ";
+        speakTextOnly("ลองอีกครั้ง ชื่อตัวอักษรของภาพนี้ คือข้อใด");
+        setTimeout(() => button.classList.remove("wrong"), 1000);
+      }
+    }
+
+    // --- 6. เกมลากวางจับคู่ (Drag & Drop / Tap-to-Match) ---
+    function newDragSet() {
+      dragSet = shuffle(letters).slice(0, 6);
+      dragDone = 0;
+      selectedDragLetter = "";
+      $("#drag-score").textContent = `ถูก ${dragDone} จาก ${dragSet.length}`;
+      $("#drag-feedback").textContent = "แตะเลือกตัวอักษรทางซ้าย แล้วไปแตะเลือกภาพที่ตรงกันด้านขวา 🌟";
+      $("#drag-pool").innerHTML = shuffle(dragSet).map((item) => `
+        <button class="drag-card" type="button" draggable="true" data-letter="${item.l}" aria-label="${speechText(item)}">${item.l}</button>
+      `).join("");
+      $("#drop-grid").innerHTML = shuffle(dragSet).map((item) => `
+        <div class="drop-zone" data-letter="${item.l}" aria-label="วางตัวอักษรของ ${item.w}">
+          ${pictureHtml(item, "drop-picture")}
+          <div class="drop-label">${item.w}</div>
+          <div class="placed" aria-hidden="true"></div>
+        </div>
+      `).join("");
+      wireDrag();
+    }
+
+    function wireDrag() {
+      $$(".drag-card").forEach((card) => {
+        card.addEventListener("dragstart", (event) => {
+          if (card.classList.contains("used")) return;
+          event.dataTransfer.setData("text/plain", card.dataset.letter);
+          AudioSynth.init();
+        });
+        card.addEventListener("click", () => {
+          if (card.classList.contains("used")) return;
+          AudioSynth.init();
+          selectedDragLetter = card.dataset.letter;
+          $$(".drag-card").forEach((button) => button.classList.toggle("active", button.dataset.letter === selectedDragLetter));
+          const item = letters.find((entry) => entry.l === selectedDragLetter);
+          $("#drag-feedback").textContent = `👉 เลือกตัวอักษร "${item.l}" แล้ว! ตอนนี้ให้แตะที่รูปภาพคู่กันเลย`;
+          speak(item);
+        });
+      });
+
+      $$(".drop-zone").forEach((zone) => {
+        zone.addEventListener("dragover", (event) => {
+          event.preventDefault();
+          zone.classList.add("over");
+        });
+        zone.addEventListener("dragleave", () => zone.classList.remove("over"));
+        zone.addEventListener("drop", (event) => {
+          event.preventDefault();
+          zone.classList.remove("over");
+          const letter = event.dataTransfer.getData("text/plain");
+          checkDrop(letter, zone);
+        });
+        zone.addEventListener("click", () => {
+          if (selectedDragLetter) {
+            checkDrop(selectedDragLetter, zone);
+          }
+        });
+      });
+    }
+
+    function checkDrop(letter, zone) {
+      if (zone.classList.contains("done")) return;
+      const item = letters.find((entry) => entry.l === zone.dataset.letter);
+      if (letter === zone.dataset.letter) {
+        zone.classList.add("done");
+        zone.querySelector(".placed").textContent = letter;
+        const card = $(`.drag-card[data-letter="${letter}"]`);
+        if (card) {
+          card.classList.add("used");
+          card.classList.remove("active");
+          card.setAttribute("draggable", "false");
+        }
+        selectedDragLetter = "";
+        dragDone += 1;
+        $("#drag-score").textContent = `ถูก ${dragDone} จาก ${dragSet.length}`;
+        $("#drag-feedback").textContent = `✨ ยอดเยี่ยมมาก! นี่คือ ${speechText(item)}`;
+        
+        AudioSynth.playSuccess(); // เสียงตอบถูก
+        Confetti.spawn(30); // พ่นกระดาษสี 30 ชิ้น
+        
+        speak(item, "ถูกต้อง");
+        if (dragDone === dragSet.length) {
+          $("#drag-feedback").textContent = "🏆 เก่งกาจที่สุด! เล่นครบเรียบร้อยแล้วจ้า กดชุดใหม่เพื่อเล่นต่อนะ";
+          setTimeout(() => {
+            AudioSynth.playVictory(); // เสียงยินดีฉลองผ่านด่าน
+            Confetti.spawn(100); // พ่นชุดใหญ่
+          }, 400);
+        }
+      } else {
+        AudioSynth.playFailure(); // เสียงค้านตอบผิด
+        $("#drag-feedback").textContent = "❌ ตัวอักษรยังไม่ตรงกับภาพนะ ลองจับคู่ตัวอื่นดูจ้า";
+        speak(item, "ลองอีกครั้ง");
+        zone.classList.add("wrong");
+        setTimeout(() => zone.classList.remove("wrong"), 800);
+      }
+    }
+
+    function switchMode(mode) {
+      stopAutoPlay();
+      $$(".tab").forEach((tab) => tab.setAttribute("aria-selected", String(tab.dataset.mode === mode)));
+      $$(".mode").forEach((section) => section.classList.toggle("active", section.id === mode));
+      if (mode === "match") nextMatch();
+      if (mode === "drag") newDragSet();
+    }
+
+    // --- 7. การผูกเหตุการณ์และเริ่มต้นการทำงาน ---
+    $$(".tab").forEach((tab) => tab.addEventListener("click", () => switchMode(tab.dataset.mode)));
+    $("#voice-select").addEventListener("change", (event) => {
+      selectedVoiceName = event.target.value;
+      speak(letters[current]);
+    });
+    $("#unlock-sound").addEventListener("click", () => {
+      loadVoices();
+      AudioSynth.playSuccess();
+      $("#main-hint").textContent = "ถ้าได้ยินเสียงดนตรี ปิ๊ง แล้วไม่ได้ยินเสียงพูด ให้ลองคลิกเลือกกล่องเสียงอื่นในเมนูด้านบน";
+      setTimeout(() => speak(letters[current], "เสียงดังชัดเจน"), 220);
+    });
+    $("#speak-current").addEventListener("click", () => {
+      AudioSynth.init();
+      speak(letters[current]);
+    });
+    $("#random-letter").addEventListener("click", () => {
+      AudioSynth.init();
+      setCurrent(Math.floor(Math.random() * letters.length));
+    });
+    $("#next-letter").addEventListener("click", () => setCurrent(current + 1));
+    $("#prev-letter").addEventListener("click", () => setCurrent(current - 1));
+    $("#auto-play").addEventListener("click", toggleAutoPlay);
+    $("#speak-question").addEventListener("click", () => {
+      AudioSynth.init();
+      speakTextOnly("ชื่อตัวอักษรของภาพนี้ คือข้อใด");
+    });
+    $("#speak-all-tip").addEventListener("click", () => {
+      AudioSynth.init();
+      speak(letters[current]);
+    });
+    $("#new-drag").addEventListener("click", () => {
+      AudioSynth.init();
+      newDragSet();
+    });
+
+    renderLetterGrid();
+    renderCards();
+    loadVoices();
+    Confetti.init();
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+      setTimeout(loadVoices, 500);
+      setTimeout(loadVoices, 1200);
+    }
+    setCurrent(0, false);
+  </script>
+</body>
+</html>
