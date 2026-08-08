@@ -1131,32 +1131,23 @@
     function getVoiceScore(voice) {
       const name = voice.name.toLowerCase();
       let score = 0;
-      if (name.includes("natural") || name.includes("neural")) {
-        score += 100;
-      }
-      if (name.includes("online")) {
-        score += 50;
-      }
-      if (name.includes("google")) {
-        score += 30;
-      }
-      if (name.includes("pattara") || name.includes("desktop")) {
-        score -= 100; // จัดให้เสียงหุ่นยนต์ Microsoft Pattara อยู่ท้ายสุดเสมอ
-      }
+      if (name.includes("natural") || name.includes("neural")) score += 100;
+      if (name.includes("online")) score += 50;
+      if (name.includes("google")) score += 30;
+      if (name.includes("pattara") || name.includes("desktop")) score -= 200;
       return score;
     }
 
     function loadVoices() {
       if (!("speechSynthesis" in window)) {
-        $("#voice-select").innerHTML = `<option value="__online_thai__">เสียงไทยออนไลน์ (แนะนำ)</option>`;
-        selectedVoiceName = "__online_thai__";
+        $("#voice-select").innerHTML = `<option value="">🔊 เสียงอ่านมาตรฐานภาษาไทย</option>`;
         return;
       }
       
       availableVoices = window.speechSynthesis.getVoices();
       
-      // กรองเฉพาะเสียงภาษาไทยเท่านั้น! และคัดเอาเสียงหุ่นยนต์ออกอย่างถาวร (Pattara และ Desktop)
-      let thaiVoices = availableVoices.filter((voice) => {
+      // กรองเฉพาะเสียงภาษาไทย และคัดเอาเสียงหุ่นยนต์ Pattara และ Desktop ออกจากอาร์เรย์อย่างถาวร
+      const thaiVoices = availableVoices.filter((voice) => {
         const name = voice.name.toLowerCase();
         const isThai = voice.lang.toLowerCase().startsWith("th") || 
                        voice.lang.toLowerCase().includes("thai") ||
@@ -1166,27 +1157,18 @@
         return isThai && !isRobotic;
       });
 
-      // เรียงลำดับคุณภาพเสียงโดยใช้คะแนน (เสียงคุณภาพสูงจะถูกดันขึ้นบนสุด)
+      // จัดเรียงคุณภาพเสียง
       thaiVoices.sort((a, b) => getVoiceScore(b) - getVoiceScore(a));
+
+      let optionsHtml = `<option value="" ${!selectedVoiceName ? "selected" : ""}>🔊 เสียงอ่านมาตรฐานภาษาไทย (แนะนำ)</option>`;
       
-      // หากพบเสียงภาษาไทย ให้ใช้เสียงไทยในเครื่องเป็นเสียงหลัก
       if (thaiVoices.length > 0) {
-        // หากยังไม่มีการเลือกเสียง หรือเสียงเดิมเป็นเสียงออนไลน์ ให้เลือกเสียงไทยในระบบตัวแรก (ซึ่งผ่านการกรอง/เรียงที่ดีที่สุดแล้ว)
-        if (!selectedVoiceName || selectedVoiceName === "__online_thai__") {
-          selectedVoiceName = thaiVoices[0].name;
-        }
-        
-        const voiceOptions = thaiVoices.map((voice) => 
-          `<option value="${voice.name}" ${voice.name === selectedVoiceName ? "selected" : ""}>${voice.name} (${voice.lang})</option>`
+        optionsHtml += thaiVoices.map((voice) => 
+          `<option value="${voice.name}" ${voice.name === selectedVoiceName ? "selected" : ""}>${voice.name}</option>`
         ).join("");
-        
-        const onlineOption = `<option value="__online_thai__" ${selectedVoiceName === "__online_thai__" ? "selected" : ""}>เสียงไทยออนไลน์ (สำรอง)</option>`;
-        
-        $("#voice-select").innerHTML = voiceOptions + onlineOption;
-      } else {
-        selectedVoiceName = "__online_thai__";
-        $("#voice-select").innerHTML = `<option value="__online_thai__" selected>เสียงไทยออนไลน์ (แนะนำ)</option>`;
       }
+
+      $("#voice-select").innerHTML = optionsHtml;
     }
 
     function onlineThaiUrl(text) {
@@ -1194,22 +1176,11 @@
     }
 
     function speakOnlineThai(text) {
-      window.speechSynthesis?.cancel();
-      
-      // ใช้ Sound of Text API ซึ่งเป็น CORS-friendly API ที่ดึงเสียงภาษาไทยของ Google Cloud/TTS ให้โดยตรง
-      // และรองรับการดึงข้อมูลบนเว็บโฮสติ้งจริง (เช่น GitHub Pages / Netlify) ได้ 100% ไม่มีปัญหา CORS
+      // เรียกใช้ Sound of Text API สำหรับการเล่นเสียงคลาวด์เปิด
       fetch("https://api.soundoftext.com/sounds", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          engine: "gtts",
-          data: {
-            text: text,
-            voice: "th-TH"
-          }
-        })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ engine: "gtts", data: { text: text, voice: "th-TH" } })
       })
       .then(res => res.json())
       .then(data => {
@@ -1217,78 +1188,39 @@
           const audioUrl = `https://soundoftext.com/static/sounds/${data.id}.mp3`;
           const audio = new Audio(audioUrl);
           audio.volume = Number($("#volume").value || 1);
-          audio.play().catch(err => {
-            console.error("Audio play blocked by browser:", err);
-            $("#main-hint").textContent = "กรุณาแตะหน้าจอ หรือกดปุ่มอีกครั้งเพื่อเล่นเสียง";
-          });
-        } else {
-          throw new Error("Soundoftext status not success");
+          audio.play().catch(() => {});
         }
       })
-      .catch(err => {
-        console.warn("Soundoftext API failed, falling back to direct CORS proxies... Error:", err);
-        // Fallback: หาก API หลักล่ม ให้พยายามใช้ CORS Proxies ร่วมกับ Google TTS ตรง ๆ
-        const ttsUrl = onlineThaiUrl(text);
-        const proxies = [
-          url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
-          url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-          url => url
-        ];
-        
-        let proxyIndex = 0;
-        
-        function tryPlay() {
-          if (proxyIndex >= proxies.length) {
-            $("#main-hint").textContent = "เสียงไทยออนไลน์มีปัญหาชั่วคราว ลองเปิดด้วยบราวเซอร์ Microsoft Edge หรือ Safari";
-            return;
-          }
-          
-          const playUrl = proxies[proxyIndex](ttsUrl);
-          const audio = new Audio();
-          if (proxyIndex < proxies.length - 1) {
-            audio.crossOrigin = "anonymous";
-          }
-          audio.src = playUrl;
-          audio.volume = Number($("#volume").value || 1);
-          
-          audio.play()
-            .then(() => {
-              $("#main-hint").textContent = "แตะตัวอักษรด้านล่าง หรือกดฟังเสียงเพื่อทบทวน ภาพเป็นรูปถ่ายจริง";
-            })
-            .catch((e) => {
-              console.warn(`Fallback proxy ${proxyIndex} failed:`, e);
-              proxyIndex++;
-              tryPlay();
-            });
-        }
-        
-        tryPlay();
-      });
+      .catch(() => {});
     }
 
     function speakTextOnly(text) {
-      if (!availableVoices.length) loadVoices();
-      if (selectedVoiceName === "__online_thai__") {
-        speakOnlineThai(text);
-        return;
-      }
       if (!("speechSynthesis" in window)) {
         speakOnlineThai(text);
         return;
       }
+
+      // ยกเลิกเสียงเดิมที่ค้างอยู่
       window.speechSynthesis.cancel();
+
       const utterance = new SpeechSynthesisUtterance(text);
-      const voice = availableVoices.find((entry) => entry.name === selectedVoiceName)
-        || availableVoices.find((entry) => entry.lang.toLowerCase().startsWith("th"));
-      if (voice) utterance.voice = voice;
       utterance.lang = "th-TH";
-      utterance.rate = 0.78;
-      utterance.pitch = 1.08;
+      utterance.rate = 0.82;
+      utterance.pitch = 1.05;
       utterance.volume = Number($("#volume").value || 1);
-      utterance.onerror = () => {
-        $("#main-hint").textContent = "ยังไม่ได้ยินเสียง ลองเลือกเสียงอื่น หรือเพิ่มเสียงภาษาไทยในระบบ/เบราว์เซอร์";
-      };
-      window.speechSynthesis.speak(utterance);
+
+      // หากมีการเลือกเสียงในรายการเมนู (ที่ไม่ใช่เสียงมาตรฐานเริ่มต้น)
+      if (availableVoices.length > 0 && selectedVoiceName) {
+        const voice = availableVoices.find((entry) => entry.name === selectedVoiceName);
+        if (voice) {
+          utterance.voice = voice;
+        }
+      }
+
+      // หน่วงเวลา 40ms เพื่อป้องกันอาการพูดค้างของบราวเซอร์ Chrome / Edge
+      setTimeout(() => {
+        window.speechSynthesis.speak(utterance);
+      }, 40);
     }
 
     function speak(item, extra = "") {
