@@ -1223,33 +1223,57 @@
       }, 40);
     }
 
-    let currentItemAudio = null;
+    let globalAudioPlayer = null;
 
-    function playMp3Audio(item) {
-      if (currentItemAudio) {
-        currentItemAudio.pause();
-        currentItemAudio.currentTime = 0;
+    function getAudioPlayer() {
+      if (!globalAudioPlayer) {
+        globalAudioPlayer = new Audio();
       }
+      return globalAudioPlayer;
+    }
+
+    function playMp3Audio(item, onEndedCallback) {
       const index = letters.indexOf(item);
-      if (index !== -1) {
-        const audioFile = `audio/${String(index + 1).padStart(2, "0")}.mp3`;
-        currentItemAudio = new Audio(audioFile);
-        currentItemAudio.volume = Number($("#volume").value || 1);
-        currentItemAudio.play().catch((err) => {
-          console.warn("Local MP3 audio play failed, falling back to TTS:", err);
-          speakTextOnly(speechText(item));
-        });
-      } else {
+      if (index === -1) {
         speakTextOnly(speechText(item));
+        if (onEndedCallback) onEndedCallback();
+        return;
       }
+
+      const audioFile = `audio/${String(index + 1).padStart(2, "0")}.mp3`;
+      const player = getAudioPlayer();
+      
+      // หยุดเสียงเดิมที่กำลังเล่นอยู่
+      player.pause();
+      player.currentTime = 0;
+      
+      // ล้าง event listener เก่า
+      player.onended = null;
+      player.onerror = null;
+
+      if (onEndedCallback) {
+        player.onended = onEndedCallback;
+      }
+
+      player.src = audioFile;
+      player.volume = Number($("#volume").value || 1);
+
+      player.play().catch((err) => {
+        console.warn(`MP3 playback failed for ${audioFile}, falling back to TTS:`, err);
+        speakTextOnly(speechText(item));
+        if (onEndedCallback) {
+          setTimeout(onEndedCallback, 1200);
+        }
+      });
     }
 
     function speak(item, extra = "") {
-      playMp3Audio(item);
       if (extra) {
-        setTimeout(() => {
+        playMp3Audio(item, () => {
           speakTextOnly(extra);
-        }, 1200);
+        });
+      } else {
+        playMp3Audio(item);
       }
     }
 
