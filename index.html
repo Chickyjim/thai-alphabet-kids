@@ -1155,26 +1155,16 @@
       
       availableVoices = window.speechSynthesis.getVoices();
       
-      // กรองเฉพาะเสียงภาษาไทยเท่านั้น! (th หรือ th-TH หรือชื่อมีคำว่า Thai/ภาษาไทย)
-      let thaiVoices = availableVoices.filter((voice) => 
-        voice.lang.toLowerCase().startsWith("th") || 
-        voice.lang.toLowerCase().includes("thai") ||
-        voice.name.toLowerCase().includes("thai") ||
-        voice.name.includes("ภาษาไทย")
-      );
-
-      // กรองเอาเสียง Pattara/Desktop (เสียงหุ่นยนต์ Windows SAPI5) ออกไป หากระบบมีเสียงภาษาไทยอื่นที่มีคุณภาพดีกว่า
-      const hasBetterThaiVoice = thaiVoices.some(voice => {
+      // กรองเฉพาะเสียงภาษาไทยเท่านั้น! และคัดเอาเสียงหุ่นยนต์ออกอย่างถาวร (Pattara และ Desktop)
+      let thaiVoices = availableVoices.filter((voice) => {
         const name = voice.name.toLowerCase();
-        return name.includes("natural") || name.includes("neural") || name.includes("google") || name.includes("online");
+        const isThai = voice.lang.toLowerCase().startsWith("th") || 
+                       voice.lang.toLowerCase().includes("thai") ||
+                       name.includes("thai") ||
+                       name.includes("ภาษาไทย");
+        const isRobotic = name.includes("pattara") || name.includes("desktop");
+        return isThai && !isRobotic;
       });
-
-      if (hasBetterThaiVoice) {
-        thaiVoices = thaiVoices.filter(voice => {
-          const name = voice.name.toLowerCase();
-          return !name.includes("pattara") && !name.includes("desktop");
-        });
-      }
 
       // เรียงลำดับคุณภาพเสียงโดยใช้คะแนน (เสียงคุณภาพสูงจะถูกดันขึ้นบนสุด)
       thaiVoices.sort((a, b) => getVoiceScore(b) - getVoiceScore(a));
