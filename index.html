@@ -1137,9 +1137,18 @@
       availableVoices = window.speechSynthesis.getVoices();
       const thaiVoices = availableVoices.filter((voice) => voice.lang.toLowerCase().startsWith("th"));
       const preferred = thaiVoices[0] || availableVoices.find((voice) => voice.lang.toLowerCase().startsWith("en")) || availableVoices[0];
-      selectedVoiceName = selectedVoiceName || (preferred ? preferred.name : "");
-      if (!thaiVoices.length) selectedVoiceName = "__online_thai__";
-      const onlineOption = `<option value="__online_thai__" ${selectedVoiceName === "__online_thai__" ? "selected" : ""}>เสียงไทยออนไลน์ (แนะนำ)</option>`;
+      
+      // ถ้าระบบมีเสียงภาษาไทย (เช่น บนมือถือ หรือบราวเซอร์ที่ติดตั้งไว้) ให้ตั้งเป็นค่าเริ่มต้นทันที
+      // ป้องกันอาการติดค้างที่ "__online_thai__" ขณะที่บราวเซอร์กำลังรอโหลดเสียงระบบ
+      if (thaiVoices.length > 0) {
+        if (!selectedVoiceName || selectedVoiceName === "__online_thai__") {
+          selectedVoiceName = preferred.name;
+        }
+      } else {
+        selectedVoiceName = "__online_thai__";
+      }
+
+      const onlineOption = `<option value="__online_thai__" ${selectedVoiceName === "__online_thai__" ? "selected" : ""}>เสียงไทยออนไลน์ (สำรอง)</option>`;
       const voiceOptions = availableVoices.map((voice) => `<option value="${voice.name}" ${voice.name === selectedVoiceName ? "selected" : ""}>${voice.name} (${voice.lang})</option>`).join("");
       $("#voice-select").innerHTML = onlineOption + voiceOptions;
     }
