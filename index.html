@@ -1150,13 +1150,28 @@
 
     function speakOnlineThai(text) {
       window.speechSynthesis?.cancel();
-      const audio = new Audio(onlineThaiUrl(text));
+      // ใช้ proxy ของ corsproxy.io เพื่อดึงข้อมูลเสียงหลีกเลี่ยงการโดนบล็อก CORS จาก Google เมื่อรันบนโฮสติ้งจริง (เช่น GitHub Pages)
+      const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(onlineThaiUrl(text))}`;
+      const audio = new Audio(proxyUrl);
       audio.volume = Number($("#volume").value || 1);
       audio.onerror = () => {
-        $("#main-hint").textContent = "เสียงไทยออนไลน์เล่นไม่ได้ อาจต้องเชื่อมต่ออินเทอร์เน็ต หรือลองเปิดด้วย Chrome/Edge";
+        // ลองเล่นแบบตรง ๆ เผื่อรันในโหมดโลคอล (file://) แล้วผ่าน
+        const directAudio = new Audio(onlineThaiUrl(text));
+        directAudio.volume = Number($("#volume").value || 1);
+        directAudio.onerror = () => {
+          $("#main-hint").textContent = "เสียงไทยออนไลน์เล่นไม่ได้ อาจต้องเชื่อมต่ออินเทอร์เน็ต หรือลองเปลี่ยนเสียงด้านบน";
+        };
+        directAudio.play().catch(() => {
+          $("#main-hint").textContent = "กรุณาคลิกเลือกเสียงพูดของระบบแทนเสียงออนไลน์หากเสียงไม่ดัง";
+        });
       };
       audio.play().catch(() => {
-        $("#main-hint").textContent = "กดปุ่มทดสอบเสียงหรือฟังเสียงอีกครั้ง เพื่ออนุญาตให้เบราว์เซอร์เล่นเสียง";
+        // หากตัวแทนผ่านพร็อกซีติดปัญหา ให้ลองแบบดั้งเดิม
+        const directAudio = new Audio(onlineThaiUrl(text));
+        directAudio.volume = Number($("#volume").value || 1);
+        directAudio.play().catch(() => {
+          $("#main-hint").textContent = "กรุณาแตะหน้าจอ หรือเลือกเสียงอื่นด้านบนเพื่อเริ่มฟังเสียง";
+        });
       });
     }
 
