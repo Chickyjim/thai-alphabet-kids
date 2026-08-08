@@ -1130,27 +1130,42 @@
 
     function loadVoices() {
       if (!("speechSynthesis" in window)) {
-        $("#voice-select").innerHTML = `<option value="__online_thai__">เสียงไทยออนไลน์</option>`;
+        $("#voice-select").innerHTML = `<option value="__online_thai__">เสียงไทยออนไลน์ (แนะนำ)</option>`;
         selectedVoiceName = "__online_thai__";
         return;
       }
-      availableVoices = window.speechSynthesis.getVoices();
-      const thaiVoices = availableVoices.filter((voice) => voice.lang.toLowerCase().startsWith("th"));
-      const preferred = thaiVoices[0] || availableVoices.find((voice) => voice.lang.toLowerCase().startsWith("en")) || availableVoices[0];
       
-      // ถ้าระบบมีเสียงภาษาไทย (เช่น บนมือถือ หรือบราวเซอร์ที่ติดตั้งไว้) ให้ตั้งเป็นค่าเริ่มต้นทันที
-      // ป้องกันอาการติดค้างที่ "__online_thai__" ขณะที่บราวเซอร์กำลังรอโหลดเสียงระบบ
+      availableVoices = window.speechSynthesis.getVoices();
+      
+      // กรองเฉพาะเสียงภาษาไทยเท่านั้น! (th หรือ th-TH หรือชื่อมีคำว่า Thai/ภาษาไทย)
+      const thaiVoices = availableVoices.filter((voice) => 
+        voice.lang.toLowerCase().startsWith("th") || 
+        voice.lang.toLowerCase().includes("thai") ||
+        voice.name.toLowerCase().includes("thai") ||
+        voice.name.includes("ภาษาไทย")
+      );
+      
+      // หากพบเสียงภาษาไทยในเครื่อง ให้ใช้เสียงไทยในเครื่องเป็นเสียงหลัก
       if (thaiVoices.length > 0) {
+        // หากยังไม่มีการเลือกเสียง หรือเสียงเดิมเป็นเสียงออนไลน์ ให้เลือกเสียงไทยในระบบตัวแรก
         if (!selectedVoiceName || selectedVoiceName === "__online_thai__") {
-          selectedVoiceName = preferred.name;
+          selectedVoiceName = thaiVoices[0].name;
         }
+        
+        // แสดงเฉพาะเสียงภาษาไทยที่ใช้งานได้จริงในตัวเครื่อง
+        const voiceOptions = thaiVoices.map((voice) => 
+          `<option value="${voice.name}" ${voice.name === selectedVoiceName ? "selected" : ""}>${voice.name} (${voice.lang})</option>`
+        ).join("");
+        
+        // เพิ่มตัวเลือกออนไลน์เป็นตัวเลือกสำรองด้านล่าง
+        const onlineOption = `<option value="__online_thai__" ${selectedVoiceName === "__online_thai__" ? "selected" : ""}>เสียงไทยออนไลน์ (สำรอง)</option>`;
+        
+        $("#voice-select").innerHTML = voiceOptions + onlineOption;
       } else {
+        // หากไม่มีเสียงไทยในระบบเลย ให้แสดงตัวเลือกออนไลน์เป็นตัวเลือกเดียวและเลือกไว้
         selectedVoiceName = "__online_thai__";
+        $("#voice-select").innerHTML = `<option value="__online_thai__" selected>เสียงไทยออนไลน์ (แนะนำ)</option>`;
       }
-
-      const onlineOption = `<option value="__online_thai__" ${selectedVoiceName === "__online_thai__" ? "selected" : ""}>เสียงไทยออนไลน์ (สำรอง)</option>`;
-      const voiceOptions = availableVoices.map((voice) => `<option value="${voice.name}" ${voice.name === selectedVoiceName ? "selected" : ""}>${voice.name} (${voice.lang})</option>`).join("");
-      $("#voice-select").innerHTML = onlineOption + voiceOptions;
     }
 
     function onlineThaiUrl(text) {
@@ -1159,29 +1174,48 @@
 
     function speakOnlineThai(text) {
       window.speechSynthesis?.cancel();
-      // ใช้ proxy ของ corsproxy.io เพื่อดึงข้อมูลเสียงหลีกเลี่ยงการโดนบล็อก CORS จาก Google เมื่อรันบนโฮสติ้งจริง (เช่น GitHub Pages)
-      const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(onlineThaiUrl(text))}`;
-      const audio = new Audio(proxyUrl);
-      audio.volume = Number($("#volume").value || 1);
-      audio.onerror = () => {
-        // ลองเล่นแบบตรง ๆ เผื่อรันในโหมดโลคอล (file://) แล้วผ่าน
-        const directAudio = new Audio(onlineThaiUrl(text));
-        directAudio.volume = Number($("#volume").value || 1);
-        directAudio.onerror = () => {
-          $("#main-hint").textContent = "เสียงไทยออนไลน์เล่นไม่ได้ อาจต้องเชื่อมต่ออินเทอร์เน็ต หรือลองเปลี่ยนเสียงด้านบน";
-        };
-        directAudio.play().catch(() => {
-          $("#main-hint").textContent = "กรุณาคลิกเลือกเสียงพูดของระบบแทนเสียงออนไลน์หากเสียงไม่ดัง";
-        });
-      };
-      audio.play().catch(() => {
-        // หากตัวแทนผ่านพร็อกซีติดปัญหา ให้ลองแบบดั้งเดิม
-        const directAudio = new Audio(onlineThaiUrl(text));
-        directAudio.volume = Number($("#volume").value || 1);
-        directAudio.play().catch(() => {
-          $("#main-hint").textContent = "กรุณาแตะหน้าจอ หรือเลือกเสียงอื่นด้านบนเพื่อเริ่มฟังเสียง";
-        });
-      });
+      
+      const ttsUrl = onlineThaiUrl(text);
+      
+      // ลิสต์ของ CORS Proxies ที่จะสลับใช้เมื่อตัวใดตัวหนึ่งมีปัญหาหรือบล็อก
+      const proxies = [
+        url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+        url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+        url => url // แบบไม่ผ่าน proxy
+      ];
+      
+      let proxyIndex = 0;
+      
+      function tryPlay() {
+        if (proxyIndex >= proxies.length) {
+          $("#main-hint").textContent = "เสียงไทยออนไลน์ไม่ทำงานชั่วคราว ลองใช้บนบราวเซอร์อื่น หรือติดตั้งเสียงไทยในระบบ";
+          return;
+        }
+        
+        const playUrl = proxies[proxyIndex](ttsUrl);
+        const audio = new Audio();
+        
+        // หากเป็นการดึงผ่าน proxy ต้องเปิด crossOrigin เพื่อให้ส่งข้อมูลเสียงข้ามโดเมนได้ถูกต้อง
+        if (proxyIndex < proxies.length - 1) {
+          audio.crossOrigin = "anonymous";
+        }
+        
+        audio.src = playUrl;
+        audio.volume = Number($("#volume").value || 1);
+        
+        audio.play()
+          .then(() => {
+            // เล่นสำเร็จ! รีเซ็ตข้อความช่วยเหลือเดิม
+            $("#main-hint").textContent = "แตะตัวอักษรด้านล่าง หรือกดฟังเสียงเพื่อทบทวน ภาพเป็นรูปถ่ายจริง";
+          })
+          .catch((err) => {
+            console.warn(`Proxy ${proxyIndex} failed, trying next... Error:`, err);
+            proxyIndex++;
+            tryPlay(); // พยายามใช้ตัวสำรองถัดไป
+          });
+      }
+      
+      tryPlay();
     }
 
     function speakTextOnly(text) {
