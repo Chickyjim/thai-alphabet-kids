@@ -718,6 +718,110 @@
       border-color: #d64545 !important;
     }
 
+    /* 🧩 Memory Card Game Styles */
+    .memory-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .memory-card {
+      aspect-ratio: 1 / 1.15;
+      perspective: 1000px;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      padding: 0;
+    }
+
+    .memory-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 20px;
+      transform-style: preserve-3d;
+      transition: transform 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 8px 18px rgba(36, 48, 68, 0.1);
+    }
+
+    .memory-card.flipped .memory-card-inner,
+    .memory-card.matched .memory-card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: 20px;
+      border: 3px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-front {
+      background: linear-gradient(135deg, var(--plum) 0%, #9b72ff 100%);
+      color: #ffffff;
+      font-size: 3rem;
+      font-weight: 700;
+      box-shadow: inset 0 0 20px rgba(255,255,255,0.2);
+    }
+
+    .card-back {
+      background: var(--panel);
+      transform: rotateY(180deg);
+      padding: 8px;
+    }
+
+    .memory-card.matched .card-back {
+      border-color: var(--good);
+      background: #effff5;
+    }
+
+    .memory-card.wrong-flip .card-back {
+      border-color: var(--bad);
+      animation: shake 0.4s ease;
+    }
+
+    /* 🎧 Audio Detective Game Styles */
+    .detective-card {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      border: 3px solid var(--line);
+      padding: 24px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      max-width: 680px;
+      margin: 0 auto 20px;
+    }
+
+    .speaker-wave {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 16px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--plum) 0%, var(--rose) 100%);
+      display: grid;
+      place-items: center;
+      font-size: 3.2rem;
+      color: white;
+      box-shadow: 0 10px 24px rgba(124, 92, 255, 0.35);
+      animation: pulse-speaker 1.5s infinite alternate;
+      cursor: pointer;
+    }
+
+    @keyframes pulse-speaker {
+      0% { transform: scale(1); box-shadow: 0 8px 20px rgba(124, 92, 255, 0.3); }
+      100% { transform: scale(1.08); box-shadow: 0 14px 32px rgba(124, 92, 255, 0.5); }
+    }
+
     @media (max-width: 1024px) {
       h1 {
         font-size: 2.9rem;
@@ -915,6 +1019,8 @@
       <button class="tab" type="button" data-mode="drag" aria-selected="false">ลากวาง</button>
       <button class="tab" type="button" data-mode="balloon" aria-selected="false">🎈 เจาะลูกโป่ง</button>
       <button class="tab" type="button" data-mode="whack" aria-selected="false">🔨 ทุบตัวอักษร</button>
+      <button class="tab" type="button" data-mode="memory" aria-selected="false">🧩 การ์ดจำ</button>
+      <button class="tab" type="button" data-mode="detective" aria-selected="false">🎧 นักสืบฟังเสียง</button>
     </nav>
 
     <main>
@@ -1043,6 +1149,34 @@
           <div class="mole-hole" data-hole="4"><div class="mole-card">จ</div></div>
           <div class="mole-hole" data-hole="5"><div class="mole-card">ฉ</div></div>
         </div>
+      </section>
+
+      <!-- Section 7: 🧩 เกมเปิดการ์ดจับคู่ความจำ -->
+      <section id="memory" class="mode" aria-labelledby="memory-title">
+        <div class="toolbar">
+          <h2 id="memory-title">🧩 เกมเปิดการ์ดจับคู่ความจำ</h2>
+          <div class="actions">
+            <div class="score" id="memory-score">จับคู่สำเร็จ 0 / 4</div>
+            <button class="btn primary" id="new-memory-game" type="button">🔄 ชุดใหม่</button>
+          </div>
+        </div>
+        <div id="memory-feedback" style="text-align: center; font-weight: 700; font-size: 1.2rem; min-height: 28px; margin-bottom: 16px; color: var(--plum);">🧩 แตะเปิดการ์ด 2 ใบเพื่อจับคู่ตัวอักษรกับรูปภาพ!</div>
+        <div class="memory-grid" id="memory-grid"></div>
+      </section>
+
+      <!-- Section 8: 🎧 เกมนักสืบฟังเสียงทายพยัญชนะ -->
+      <section id="detective" class="mode" aria-labelledby="detective-title">
+        <div class="toolbar">
+          <h2 id="detective-title">🎧 เกมนักสืบฟังเสียงทายพยัญชนะ</h2>
+          <div class="score" id="detective-score">คะแนน 0</div>
+        </div>
+        <div class="detective-card">
+          <div class="speaker-wave" id="play-detective-sound" role="button" aria-label="กดฟังเสียงลับ">🎧</div>
+          <div style="font-size: 1.15rem; color: var(--muted); font-weight: 600; margin-bottom: 6px;">ฟังเสียงลับแล้วทายว่าคือตัวอักษรใด</div>
+          <button class="btn primary" id="speak-detective-btn" type="button">🔊 กดเพื่อฟังเสียงอีกครั้ง</button>
+        </div>
+        <div id="detective-feedback" style="text-align: center; font-weight: 700; font-size: 1.2rem; min-height: 28px; margin-bottom: 16px; color: var(--plum);"></div>
+        <div class="answer-grid" id="detective-choices"></div>
       </section>
     </main>
   </div>
@@ -1937,7 +2071,167 @@
       }
     }
 
-    // --- 9. การผูกเหตุการณ์และเริ่มต้นการทำงาน ---
+    // --- 9. เกมเปิดการ์ดจับคู่ความจำ (Memory Card Flip Game) ---
+    let memoryCards = [];
+    let flippedCards = [];
+    let memoryMatchedPairs = 0;
+    let isMemoryLock = false;
+
+    function startMemoryGame() {
+      flippedCards = [];
+      memoryMatchedPairs = 0;
+      isMemoryLock = false;
+      $("#memory-score").textContent = "จับคู่สำเร็จ 0 / 4";
+      $("#memory-feedback").textContent = "🧩 แตะเปิดการ์ด 2 ใบเพื่อจับคู่ตัวอักษรกับรูปภาพ!";
+
+      const selectedLetters = shuffle(letters).slice(0, 4);
+      const deck = [];
+      selectedLetters.forEach((item, idx) => {
+        deck.push({ id: `letter-${idx}`, type: "letter", item });
+        deck.push({ id: `photo-${idx}`, type: "photo", item });
+      });
+
+      memoryCards = shuffle(deck);
+
+      const grid = $("#memory-grid");
+      grid.innerHTML = memoryCards.map((card, idx) => `
+        <button class="memory-card" type="button" data-index="${idx}">
+          <div class="memory-card-inner">
+            <div class="card-front">❓</div>
+            <div class="card-back">
+              ${card.type === "letter" ? 
+                `<div style="font-size: 3.8rem; font-weight: 700; color: var(--plum);">${card.item.l}</div>` : 
+                pictureHtml(card.item, "card-picture")
+              }
+            </div>
+          </div>
+        </button>
+      `).join("");
+
+      $$(".memory-card").forEach((cardBtn) => {
+        cardBtn.addEventListener("click", () => handleMemoryFlip(cardBtn));
+      });
+    }
+
+    function handleMemoryFlip(cardBtn) {
+      if (isMemoryLock) return;
+      const idx = Number(cardBtn.dataset.index);
+      const cardObj = memoryCards[idx];
+
+      if (cardBtn.classList.contains("flipped") || cardBtn.classList.contains("matched")) return;
+
+      AudioSynth.init();
+      cardBtn.classList.add("flipped");
+      flippedCards.push({ btn: cardBtn, obj: cardObj });
+
+      AudioSynth.playTone(600, 0.08, "sine");
+
+      if (flippedCards.length === 2) {
+        isMemoryLock = true;
+        const [card1, card2] = flippedCards;
+
+        if (card1.obj.item.l === card2.obj.item.l) {
+          setTimeout(() => {
+            card1.btn.classList.add("matched");
+            card2.btn.classList.add("matched");
+            AudioSynth.playSuccess();
+            Confetti.spawn(30);
+
+            memoryMatchedPairs += 1;
+            $("#memory-score").textContent = `จับคู่สำเร็จ ${memoryMatchedPairs} / 4`;
+            $("#memory-feedback").textContent = `🎉 จับคู่สำเร็จ! นี่คือ ${speechText(card1.obj.item)}`;
+            
+            speak(card1.obj.item, "ถูกต้อง");
+
+            flippedCards = [];
+            isMemoryLock = false;
+
+            if (memoryMatchedPairs === 4) {
+              $("#memory-feedback").textContent = "🏆 ยอดเยี่ยมที่สุด! จับคู่การ์ดครบ 4 คู่เรียบร้อยแล้วจ้า";
+              setTimeout(() => {
+                AudioSynth.playVictory();
+                Confetti.spawn(100);
+                sendDesktopNotification("🧩 ยอดเยี่ยมมากๆ!", "คุณเปิดการ์ดจับคู่ความจำครบทุกคู่แล้ว");
+              }, 400);
+            }
+          }, 400);
+        } else {
+          setTimeout(() => {
+            card1.btn.classList.add("wrong-flip");
+            card2.btn.classList.add("wrong-flip");
+            AudioSynth.playFailure();
+            $("#memory-feedback").textContent = "❌ ยังไม่ตรงคู่นะ ลองเปิดใบอื่นดูจ้า";
+
+            setTimeout(() => {
+              card1.btn.classList.remove("flipped", "wrong-flip");
+              card2.btn.classList.remove("flipped", "wrong-flip");
+              flippedCards = [];
+              isMemoryLock = false;
+            }, 900);
+          }, 400);
+        }
+      }
+    }
+
+    // --- 10. เกมนักสืบฟังเสียงทายพยัญชนะ (Audio Detective Game) ---
+    let detectiveTarget = null;
+    let detectiveScore = 0;
+
+    function startDetectiveGame() {
+      detectiveTarget = letters[Math.floor(Math.random() * letters.length)];
+      $("#detective-feedback").textContent = "🎧 กดปุ่มลำโพงฟังเสียงลับ แล้วทายว่าคือตัวอักษรใด!";
+
+      const choices = shuffle([
+        detectiveTarget,
+        ...shuffle(letters.filter((item) => item !== detectiveTarget)).slice(0, 3)
+      ]);
+
+      const choicesGrid = $("#detective-choices");
+      choicesGrid.innerHTML = choices.map((item) => `
+        <button class="answer" type="button" data-letter="${item.l}" aria-label="ตัวอักษร ${item.l}">
+          <span class="answer-letter">${item.l}</span>
+        </button>
+      `).join("");
+
+      $$("#detective-choices .answer").forEach((button) => {
+        button.addEventListener("click", () => handleDetectiveChoice(button));
+      });
+
+      setTimeout(() => {
+        AudioSynth.init();
+        playMp3Audio(detectiveTarget);
+      }, 350);
+    }
+
+    function handleDetectiveChoice(button) {
+      const hitLetter = button.dataset.letter;
+      const isCorrect = hitLetter === detectiveTarget.l;
+
+      button.classList.add(isCorrect ? "correct" : "wrong");
+
+      if (isCorrect) {
+        detectiveScore += 1;
+        $("#detective-score").textContent = `คะแนน ${detectiveScore}`;
+        $("#detective-feedback").textContent = `🎉 ถูกต้องแล้ว! เสียงลับคือ ${speechText(detectiveTarget)}`;
+
+        AudioSynth.playSuccess();
+        Confetti.spawn(40);
+
+        if (detectiveScore % 5 === 0) {
+          sendDesktopNotification("🎧 หูไวสุดๆ!", `คุณทายเสียงนักสืบได้คะแนนสะสม ${detectiveScore} คะแนนแล้ว`);
+        }
+
+        speak(detectiveTarget, "ถูกต้อง");
+        setTimeout(startDetectiveGame, 1500);
+      } else {
+        AudioSynth.playFailure();
+        $("#detective-feedback").textContent = `❌ ยังไม่ใช่จ้า... กดฟังเสียงลับแล้วทายอีกรอบนะ`;
+        speakTextOnly("ลองอีกครั้ง กดฟังเสียงแล้วทายอีกรอบ");
+        setTimeout(() => button.classList.remove("wrong"), 1000);
+      }
+    }
+
+    // --- 11. การผูกเหตุการณ์และเริ่มต้นการทำงาน ---
     $$(".mole-hole").forEach((hole) => hole.addEventListener("click", () => handleWhackClick(hole)));
     $("#speak-balloon-prompt").addEventListener("click", () => {
       AudioSynth.init();
@@ -1946,6 +2240,18 @@
     $("#speak-whack-prompt").addEventListener("click", () => {
       AudioSynth.init();
       if (whackTarget) speak(whackTarget);
+    });
+    $("#new-memory-game").addEventListener("click", () => {
+      AudioSynth.init();
+      startMemoryGame();
+    });
+    $("#play-detective-sound").addEventListener("click", () => {
+      AudioSynth.init();
+      if (detectiveTarget) playMp3Audio(detectiveTarget);
+    });
+    $("#speak-detective-btn").addEventListener("click", () => {
+      AudioSynth.init();
+      if (detectiveTarget) playMp3Audio(detectiveTarget);
     });
     $$(".tab").forEach((tab) => tab.addEventListener("click", () => switchMode(tab.dataset.mode)));
     $("#voice-select").addEventListener("change", (event) => {
