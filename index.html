@@ -589,6 +589,135 @@
       box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
     }
 
+    /* 🎈 Balloon Game Styles */
+    .balloon-prompt, .whack-prompt {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(8px);
+      border-radius: 20px;
+      margin-bottom: 16px;
+      border: 2px solid var(--line);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+    }
+
+    .balloon-stage {
+      position: relative;
+      width: 100%;
+      height: min(420px, 58vh);
+      background: linear-gradient(180deg, #b3e5fc 0%, #e1f5fe 65%, #c8e6c9 100%);
+      border-radius: 24px;
+      border: 3px solid var(--line);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      touch-action: manipulation;
+    }
+
+    .balloon-item {
+      position: absolute;
+      width: min(86px, 20vw);
+      height: min(106px, 25vw);
+      border-radius: 50% 50% 50% 50% / 42% 42% 58% 58%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: #ffffff;
+      text-shadow: 2px 2px 0 rgba(0,0,0,0.25);
+      cursor: pointer;
+      box-shadow: inset -8px -8px 0 rgba(0,0,0,0.18), 0 10px 20px rgba(0,0,0,0.15);
+      transition: transform 0.15s ease, opacity 0.3s ease;
+      user-select: none;
+      -webkit-user-select: none;
+      z-index: 10;
+    }
+
+    .balloon-item::after {
+      content: "";
+      position: absolute;
+      bottom: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 18px;
+      background: rgba(0,0,0,0.3);
+    }
+
+    .balloon-item.pop {
+      transform: scale(1.6);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .balloon-item.wrong {
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px) rotate(-6deg); }
+      75% { transform: translateX(8px) rotate(6deg); }
+    }
+
+    /* 🔨 Whack-a-Letter Game Styles */
+    .whack-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    .mole-hole {
+      position: relative;
+      aspect-ratio: 1.15 / 1;
+      background: radial-gradient(ellipse at center, #795548 0%, #4e342e 70%, #3e2723 100%);
+      border-radius: 50% 50% 40% 40% / 60% 60% 40% 40%;
+      border: 4px solid #3e2723;
+      box-shadow: inset 0 10px 22px rgba(0,0,0,0.65), 0 8px 16px rgba(0,0,0,0.15);
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .mole-card {
+      position: absolute;
+      bottom: -100%;
+      left: 10%;
+      width: 80%;
+      height: 85%;
+      background: linear-gradient(180deg, #ffecd2 0%, #fcb69f 100%);
+      border: 3px solid #e07a5f;
+      border-radius: 20px 20px 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.4rem;
+      font-weight: 700;
+      color: #2b2d42;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.2);
+      transition: bottom 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.2s;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .mole-hole.up .mole-card {
+      bottom: 0;
+    }
+
+    .mole-card.hit {
+      background: #a8e6cf !important;
+      border-color: #2e9d62 !important;
+      transform: scale(1.08);
+    }
+
+    .mole-card.miss {
+      background: #ff8b94 !important;
+      border-color: #d64545 !important;
+    }
+
     @media (max-width: 1024px) {
       h1 {
         font-size: 2.9rem;
@@ -784,6 +913,8 @@
       <button class="tab" type="button" data-mode="cards" aria-selected="false">บัตรคำ</button>
       <button class="tab" type="button" data-mode="match" aria-selected="false">เกมจับคู่</button>
       <button class="tab" type="button" data-mode="drag" aria-selected="false">ลากวาง</button>
+      <button class="tab" type="button" data-mode="balloon" aria-selected="false">🎈 เจาะลูกโป่ง</button>
+      <button class="tab" type="button" data-mode="whack" aria-selected="false">🔨 ทุบตัวอักษร</button>
     </nav>
 
     <main>
@@ -865,6 +996,53 @@
           </div>
         </div>
         <div class="feedback" id="drag-feedback" aria-live="polite"></div>
+      </section>
+
+      <!-- Section 5: 🎈 เกมเจาะลูกโป่งพยัญชนะ -->
+      <section id="balloon" class="mode" aria-labelledby="balloon-title">
+        <div class="toolbar">
+          <h2 id="balloon-title">🎈 เกมเจาะลูกโป่งพยัญชนะ</h2>
+          <div class="score" id="balloon-score">คะแนน 0</div>
+        </div>
+        <div class="balloon-prompt">
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <div id="balloon-picture" class="question-picture" style="width: 70px; height: 70px; border-radius: 12px; border: 2px solid var(--line); flex-shrink: 0;" role="img"></div>
+            <div>
+              <div style="font-size: 0.95rem; color: var(--muted); font-weight: 600;">โจทย์: เจาะลูกโป่งตัวอักษร</div>
+              <div id="balloon-target-text" style="font-size: 1.8rem; font-weight: 700; color: var(--rose);">ก ไก่</div>
+            </div>
+          </div>
+          <button class="btn primary" id="speak-balloon-prompt" type="button">🔊 ฟังโจทย์</button>
+        </div>
+        <div id="balloon-feedback" style="text-align: center; font-weight: 700; font-size: 1.2rem; min-height: 28px; margin-bottom: 10px; color: var(--plum);"></div>
+        <div class="balloon-stage" id="balloon-stage"></div>
+      </section>
+
+      <!-- Section 6: 🔨 เกมทุบตัวอักษร / มุดหลุม -->
+      <section id="whack" class="mode" aria-labelledby="whack-title">
+        <div class="toolbar">
+          <h2 id="whack-title">🔨 เกมทุบตัวอักษรที่โผล่ขึ้นมา</h2>
+          <div class="score" id="whack-score">คะแนน 0</div>
+        </div>
+        <div class="whack-prompt">
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <div id="whack-picture" class="question-picture" style="width: 70px; height: 70px; border-radius: 12px; border: 2px solid var(--line); flex-shrink: 0;" role="img"></div>
+            <div>
+              <div style="font-size: 0.95rem; color: var(--muted); font-weight: 600;">โจทย์: ตาไวทุบตัวอักษร</div>
+              <div id="whack-target-text" style="font-size: 1.8rem; font-weight: 700; color: var(--plum);">ก ไก่</div>
+            </div>
+          </div>
+          <button class="btn primary" id="speak-whack-prompt" type="button">🔊 ฟังโจทย์</button>
+        </div>
+        <div id="whack-feedback" style="text-align: center; font-weight: 700; font-size: 1.2rem; min-height: 28px; margin-bottom: 10px; color: var(--plum);"></div>
+        <div class="whack-grid" id="whack-grid">
+          <div class="mole-hole" data-hole="0"><div class="mole-card">ก</div></div>
+          <div class="mole-hole" data-hole="1"><div class="mole-card">ข</div></div>
+          <div class="mole-hole" data-hole="2"><div class="mole-card">ค</div></div>
+          <div class="mole-hole" data-hole="3"><div class="mole-card">ง</div></div>
+          <div class="mole-hole" data-hole="4"><div class="mole-card">จ</div></div>
+          <div class="mole-hole" data-hole="5"><div class="mole-card">ฉ</div></div>
+        </div>
       </section>
     </main>
   </div>
@@ -1012,6 +1190,42 @@
         notes.forEach((freq, idx) => {
           this.playTone(freq, durs[idx], "sine", times[idx]);
         });
+      },
+
+      playPop() {
+        this.init();
+        if (!this.ctx) return;
+        if (this.ctx.state === "suspended") this.ctx.resume();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(400, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(850, this.ctx.currentTime + 0.08);
+        const maxVol = Number($("#volume").value || 1) * 0.25;
+        gain.gain.setValueAtTime(maxVol, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.08);
+      },
+
+      playWhack() {
+        this.init();
+        if (!this.ctx) return;
+        if (this.ctx.state === "suspended") this.ctx.resume();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(280, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(70, this.ctx.currentTime + 0.12);
+        const maxVol = Number($("#volume").value || 1) * 0.3;
+        gain.gain.setValueAtTime(maxVol, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.12);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.12);
       }
     };
 
@@ -1520,13 +1734,219 @@
 
     function switchMode(mode) {
       stopAutoPlay();
+      stopBalloonGame();
+      stopWhackGame();
       $$(".tab").forEach((tab) => tab.setAttribute("aria-selected", String(tab.dataset.mode === mode)));
       $$(".mode").forEach((section) => section.classList.toggle("active", section.id === mode));
       if (mode === "match") nextMatch();
       if (mode === "drag") newDragSet();
+      if (mode === "balloon") startBalloonGame();
+      if (mode === "whack") startWhackGame();
     }
 
-    // --- 7. การผูกเหตุการณ์และเริ่มต้นการทำงาน ---
+    // --- 7. เกมเจาะลูกโป่งพยัญชนะ (Balloon Pop Game) ---
+    let balloonTarget = null;
+    let balloonScore = 0;
+    let balloonAnimId = null;
+    let activeBalloons = [];
+    const balloonColors = ["#ff7aa8", "#7c5cff", "#ff9f43", "#4caf82", "#76b7f2", "#ffd166"];
+
+    function stopBalloonGame() {
+      if (balloonAnimId) {
+        cancelAnimationFrame(balloonAnimId);
+        balloonAnimId = null;
+      }
+      activeBalloons = [];
+      const stage = $("#balloon-stage");
+      if (stage) stage.innerHTML = "";
+    }
+
+    function startBalloonGame() {
+      stopBalloonGame();
+      balloonTarget = letters[Math.floor(Math.random() * letters.length)];
+      applyPhoto($("#balloon-picture"), balloonTarget);
+      $("#balloon-target-text").textContent = speechText(balloonTarget);
+      $("#balloon-feedback").textContent = "🎈 แตะเจาะลูกโป่งที่เป็นตัวอักษรนี้เลย!";
+      
+      speak(balloonTarget);
+
+      const distractors = shuffle(letters.filter((item) => item !== balloonTarget)).slice(0, 3);
+      const levelLetters = shuffle([balloonTarget, ...distractors]);
+
+      const stage = $("#balloon-stage");
+      if (!stage) return;
+      stage.innerHTML = "";
+
+      const stageWidth = stage.clientWidth || 600;
+      const colWidth = stageWidth / 4;
+
+      activeBalloons = levelLetters.map((item, idx) => {
+        const balloon = document.createElement("div");
+        balloon.className = "balloon-item";
+        balloon.style.backgroundColor = balloonColors[idx % balloonColors.length];
+        balloon.textContent = item.l;
+        balloon.dataset.letter = item.l;
+        
+        const x = idx * colWidth + Math.random() * (colWidth - 84);
+        const y = Math.random() * -150 - 50;
+        const speed = 1.2 + Math.random() * 0.8;
+
+        balloon.style.left = `${Math.max(10, x)}px`;
+        balloon.style.bottom = `${y}px`;
+
+        balloon.addEventListener("click", () => handleBalloonClick(balloon, item));
+        stage.appendChild(balloon);
+
+        return { element: balloon, x, y, speed, item };
+      });
+
+      function animate() {
+        const stageHeight = stage.clientHeight || 380;
+        activeBalloons.forEach((b) => {
+          if (b.element.classList.contains("pop")) return;
+          b.y += b.speed;
+          if (b.y > stageHeight + 100) {
+            b.y = -120;
+          }
+          b.element.style.bottom = `${b.y}px`;
+        });
+        balloonAnimId = requestAnimationFrame(animate);
+      }
+
+      balloonAnimId = requestAnimationFrame(animate);
+    }
+
+    function handleBalloonClick(balloonEl, item) {
+      if (balloonEl.classList.contains("pop")) return;
+
+      if (item.l === balloonTarget.l) {
+        balloonEl.classList.add("pop");
+        AudioSynth.playPop();
+        AudioSynth.playSuccess();
+        Confetti.spawn(40);
+
+        balloonScore += 1;
+        $("#balloon-score").textContent = `คะแนน ${balloonScore}`;
+        $("#balloon-feedback").textContent = `🎉 แตกแล้ว! ถูกต้อง คือ ${speechText(balloonTarget)}`;
+
+        if (balloonScore % 5 === 0) {
+          sendDesktopNotification("🎈 เก่งมากๆ!", `คุณเจาะลูกโป่งได้คะแนนสะสม ${balloonScore} คะแนนแล้ว`);
+        }
+
+        speak(balloonTarget, "ถูกต้อง");
+        setTimeout(startBalloonGame, 1400);
+      } else {
+        AudioSynth.playFailure();
+        balloonEl.classList.add("wrong");
+        $("#balloon-feedback").textContent = `❌ ยังไม่ใช่จ้า หาตัวอักษร "${balloonTarget.l}"`;
+        speakTextOnly(`ลองอีกครั้ง หาตัวอักษร ${balloonTarget.l}`);
+        setTimeout(() => balloonEl.classList.remove("wrong"), 800);
+      }
+    }
+
+    // --- 8. เกมทุบตัวอักษรมุดหลุม (Whack-a-Letter Game) ---
+    let whackTarget = null;
+    let whackScore = 0;
+    let whackTimer = null;
+    let isWhackActive = false;
+
+    function stopWhackGame() {
+      if (whackTimer) {
+        clearInterval(whackTimer);
+        whackTimer = null;
+      }
+      isWhackActive = false;
+      $$(".mole-hole").forEach(h => h.classList.remove("up"));
+    }
+
+    function startWhackGame() {
+      stopWhackGame();
+      isWhackActive = true;
+      whackTarget = letters[Math.floor(Math.random() * letters.length)];
+      applyPhoto($("#whack-picture"), whackTarget);
+      $("#whack-target-text").textContent = speechText(whackTarget);
+      $("#whack-feedback").textContent = "🔨 ตาไว! คอยทุบตัวอักษรโผล่ขึ้นมาให้ทันนะ";
+
+      speak(whackTarget);
+
+      popMoles();
+      whackTimer = setInterval(popMoles, 2000);
+    }
+
+    function popMoles() {
+      if (!isWhackActive) return;
+      const holes = $$(".mole-hole");
+      holes.forEach(h => h.classList.remove("up"));
+
+      const targetHoleIdx = Math.floor(Math.random() * holes.length);
+      const distractors = shuffle(letters.filter(item => item !== whackTarget)).slice(0, 5);
+      let distractorIdx = 0;
+
+      holes.forEach((hole, idx) => {
+        const card = hole.querySelector(".mole-card");
+        if (!card) return;
+        card.classList.remove("hit", "miss");
+
+        if (idx === targetHoleIdx || Math.random() < 0.4) {
+          if (idx === targetHoleIdx) {
+            card.textContent = whackTarget.l;
+            card.dataset.letter = whackTarget.l;
+          } else {
+            const item = distractors[distractorIdx++];
+            card.textContent = item ? item.l : "ก";
+            card.dataset.letter = item ? item.l : "ก";
+          }
+          
+          setTimeout(() => {
+            if (isWhackActive) hole.classList.add("up");
+          }, idx * 50);
+        }
+      });
+    }
+
+    function handleWhackClick(hole) {
+      if (!isWhackActive || !hole.classList.contains("up")) return;
+      const card = hole.querySelector(".mole-card");
+      if (!card) return;
+
+      const hitLetter = card.dataset.letter;
+
+      if (hitLetter === whackTarget.l) {
+        hole.classList.remove("up");
+        card.classList.add("hit");
+        AudioSynth.playWhack();
+        AudioSynth.playSuccess();
+        Confetti.spawn(40);
+
+        whackScore += 1;
+        $("#whack-score").textContent = `คะแนน ${whackScore}`;
+        $("#whack-feedback").textContent = `🔨 ทุบเป๊ะ! ถูกต้อง คือ ${speechText(whackTarget)}`;
+
+        if (whackScore % 5 === 0) {
+          sendDesktopNotification("🔨 ตาไวสุดๆ!", `คุณทุบตัวอักษรได้คะแนน ${whackScore} คะแนนแล้ว`);
+        }
+
+        speak(whackTarget, "ถูกต้อง");
+        stopWhackGame();
+        setTimeout(startWhackGame, 1400);
+      } else {
+        AudioSynth.playFailure();
+        card.classList.add("miss");
+        $("#whack-feedback").textContent = `❌ พลาดไปนิด! ทุบตัวอักษร "${whackTarget.l}" นะ`;
+        speakTextOnly(`ลองอีกครั้ง ทุบตัวอักษร ${whackTarget.l}`);
+      }
+    }
+
+    // --- 9. การผูกเหตุการณ์และเริ่มต้นการทำงาน ---
+    $$(".mole-hole").forEach((hole) => hole.addEventListener("click", () => handleWhackClick(hole)));
+    $("#speak-balloon-prompt").addEventListener("click", () => {
+      AudioSynth.init();
+      if (balloonTarget) speak(balloonTarget);
+    });
+    $("#speak-whack-prompt").addEventListener("click", () => {
+      AudioSynth.init();
+      if (whackTarget) speak(whackTarget);
+    });
     $$(".tab").forEach((tab) => tab.addEventListener("click", () => switchMode(tab.dataset.mode)));
     $("#voice-select").addEventListener("change", (event) => {
       selectedVoiceName = event.target.value;
