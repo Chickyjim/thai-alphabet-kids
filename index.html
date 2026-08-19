@@ -633,7 +633,7 @@
       position: relative;
       width: 100%;
       height: min(440px, 60vh);
-      background: linear-gradient(180deg, #74c0fc 0%, #bbf2f6 55%, #c3fae8 85%, #8ce99a 100%);
+      background: linear-gradient(180deg, #64b5f6 0%, #90caf9 40%, #e1f5fe 70%, #a5d6a7 100%);
       border-radius: 28px;
       border: 3px solid var(--line);
       overflow: hidden;
@@ -641,27 +641,42 @@
       touch-action: manipulation;
     }
 
-    /* Cartoon Cloud & Hills in Balloon Stage */
+    /* Cartoon Sun & Hills in Balloon Stage */
     .balloon-stage::before {
       content: "";
       position: absolute;
-      bottom: -10px;
+      bottom: -12px;
       left: 0;
       width: 100%;
-      height: 48px;
-      background: radial-gradient(ellipse at 50% 100%, #51cf66 0%, #40c057 60%, transparent 100%);
+      height: 52px;
+      background: radial-gradient(ellipse at 50% 100%, #66bb6a 0%, #43a047 60%, transparent 100%);
       border-radius: 50% 50% 0 0;
       pointer-events: none;
       z-index: 1;
     }
 
+    .stage-sun {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      width: 54px;
+      height: 54px;
+      background: radial-gradient(circle, #fff176 0%, #fbc02d 70%, #f57f17 100%);
+      border-radius: 50%;
+      box-shadow: 0 0 30px rgba(255, 235, 59, 0.7);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Fluffy Multi-Puff Cartoon Clouds */
     .stage-cloud {
       position: absolute;
-      background: rgba(255, 255, 255, 0.75);
+      background: rgba(255, 255, 255, 0.88);
       border-radius: 50px;
       pointer-events: none;
-      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.04));
+      filter: drop-shadow(0 6px 14px rgba(0, 90, 180, 0.1));
       animation: driftCloud linear infinite;
+      z-index: 2;
     }
 
     .stage-cloud::before, .stage-cloud::after {
@@ -671,42 +686,72 @@
       border-radius: 50%;
     }
 
+    .stage-cloud::before {
+      width: 50%;
+      height: 140%;
+      top: -60%;
+      left: 18%;
+    }
+
+    .stage-cloud::after {
+      width: 36%;
+      height: 100%;
+      top: -40%;
+      right: 18%;
+    }
+
     @keyframes driftCloud {
-      from { transform: translateX(-150px); }
-      to { transform: translateX(calc(100vw + 150px)); }
+      from { transform: translateX(-160px); }
+      to { transform: translateX(calc(100vw + 160px)); }
     }
 
     .balloon-item {
       position: absolute;
-      width: min(92px, 21vw);
-      height: min(114px, 26vw);
+      width: min(94px, 22vw);
+      height: min(118px, 27vw);
       border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 3rem;
-      font-weight: 700;
+      font-size: 3.2rem;
+      font-weight: 800;
       color: #ffffff;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.25), 0 0 12px rgba(255, 255, 255, 0.4);
+      text-shadow: 0 3px 6px rgba(0, 0, 0, 0.28), 0 0 16px rgba(255, 255, 255, 0.5);
       cursor: pointer;
-      box-shadow: inset -10px -10px 18px rgba(0, 0, 0, 0.2), inset 10px 10px 18px rgba(255, 255, 255, 0.4), 0 12px 24px rgba(0, 0, 0, 0.16);
+      box-shadow: 
+        inset -12px -12px 22px rgba(0, 0, 0, 0.22),
+        inset 8px 8px 18px rgba(255, 255, 255, 0.45),
+        0 14px 28px rgba(0, 0, 0, 0.16);
       transition: transform 0.15s ease, opacity 0.25s ease;
       user-select: none;
       -webkit-user-select: none;
       z-index: 10;
-      animation: balloonSway 2.4s ease-in-out infinite alternate;
+      animation: balloonSway 2.8s ease-in-out infinite alternate;
     }
 
-    /* Glossy 3D Highlight on Balloon */
+    /* Glossy 3D Highlight on Balloon (Top-Left primary shine) */
     .balloon-item::before {
       content: "";
       position: absolute;
-      top: 14%;
-      left: 18%;
-      width: 28%;
-      height: 24%;
+      top: 12%;
+      left: 16%;
+      width: 34%;
+      height: 28%;
       border-radius: 50%;
-      background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0) 80%);
+      background: radial-gradient(ellipse at 35% 35%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.4) 45%, rgba(255, 255, 255, 0) 80%);
+      transform: rotate(-25deg);
+      pointer-events: none;
+    }
+
+    /* Secondary glossy light reflection rim (bottom-right crescent) */
+    .balloon-rim-light {
+      position: absolute;
+      bottom: 12%;
+      right: 14%;
+      width: 28%;
+      height: 20%;
+      border-radius: 50%;
+      background: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 75%);
       pointer-events: none;
     }
 
@@ -717,11 +762,11 @@
       bottom: -8px;
       left: 50%;
       transform: translateX(-50%);
-      width: 10px;
-      height: 8px;
+      width: 12px;
+      height: 9px;
       background: inherit;
       border-radius: 2px 2px 50% 50%;
-      box-shadow: 0 6px 0 -2px rgba(0,0,0,0.2);
+      box-shadow: 0 6px 0 -2px rgba(0,0,0,0.25);
     }
 
     .balloon-string {
@@ -729,31 +774,89 @@
       top: 100%;
       left: 50%;
       width: 2px;
-      height: 24px;
-      background: rgba(100, 100, 100, 0.35);
+      height: 26px;
+      background: rgba(80, 80, 80, 0.35);
       transform-origin: top center;
-      animation: stringWave 2.4s ease-in-out infinite alternate;
+      animation: stringWave 2.8s ease-in-out infinite alternate;
     }
 
     @keyframes balloonSway {
-      0% { transform: rotate(-3deg); }
-      100% { transform: rotate(3deg); }
+      0% { transform: rotate(-4deg); }
+      100% { transform: rotate(4deg); }
     }
 
     @keyframes stringWave {
-      0% { transform: rotate(5deg); }
-      100% { transform: rotate(-5deg); }
+      0% { transform: rotate(6deg); }
+      100% { transform: rotate(-6deg); }
     }
 
     .balloon-item.pop {
-      transform: scale(1.75) rotate(10deg);
+      transform: scale(1.6) rotate(10deg);
       opacity: 0;
       pointer-events: none;
-      filter: blur(2px);
+      filter: blur(3px);
     }
 
     .balloon-item.wrong {
       animation: shake 0.4s ease;
+    }
+
+    /* 🎆 Firework Burst Particle Effects */
+    .firework-particle {
+      position: absolute;
+      pointer-events: none;
+      border-radius: 50%;
+      will-change: transform, opacity;
+      animation: particleFly 0.85s cubic-bezier(0.12, 0.85, 0.45, 1) forwards;
+      z-index: 30;
+    }
+
+    .firework-star {
+      position: absolute;
+      pointer-events: none;
+      font-size: 1.6rem;
+      will-change: transform, opacity;
+      animation: starFly 0.95s cubic-bezier(0.12, 0.85, 0.45, 1) forwards;
+      filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.9));
+      z-index: 30;
+      user-select: none;
+    }
+
+    .firework-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 3px solid #ffffff;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      animation: ringExpand 0.65s ease-out forwards;
+      z-index: 29;
+    }
+
+    @keyframes ringExpand {
+      0% { width: 10px; height: 10px; opacity: 1; border-width: 5px; }
+      100% { width: 180px; height: 180px; opacity: 0; border-width: 1px; }
+    }
+
+    @keyframes particleFly {
+      0% {
+        transform: translate(0, 0) scale(1.3);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(var(--tx), calc(var(--ty) + 40px)) scale(0);
+        opacity: 0;
+      }
+    }
+
+    @keyframes starFly {
+      0% {
+        transform: translate(0, 0) scale(1.4) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(var(--tx), calc(var(--ty) + 45px)) scale(0.2) rotate(var(--rot));
+        opacity: 0;
+      }
     }
 
     @keyframes shake {
@@ -2069,10 +2172,16 @@
     }
 
     function createBalloonClouds(stage) {
+      // พระอาทิตย์สดใส
+      const sun = document.createElement("div");
+      sun.className = "stage-sun";
+      stage.appendChild(sun);
+
+      // เมฆการ์ตูนปุยนุ่ม 3 ก้อน ลอยผ่านด้วยความเร็วต่างกัน
       const cloudsData = [
-        { top: 15, w: 90, h: 32, dur: 18, delay: 0 },
-        { top: 90, w: 120, h: 42, dur: 25, delay: -8 },
-        { top: 180, w: 80, h: 28, dur: 21, delay: -14 }
+        { top: 18, w: 130, h: 44, dur: 22, delay: 0 },
+        { top: 85, w: 160, h: 52, dur: 32, delay: -11 },
+        { top: 165, w: 115, h: 38, dur: 26, delay: -17 }
       ];
       cloudsData.forEach((c) => {
         const cloud = document.createElement("div");
@@ -2084,6 +2193,63 @@
         cloud.style.animationDelay = `${c.delay}s`;
         stage.appendChild(cloud);
       });
+    }
+
+    function spawnFirework(stage, x, y, baseColor) {
+      if (!stage) return;
+
+      // 1. วงแสงช็อคเวฟขยายตัว (Expanding Shockwave Ring)
+      const ring = document.createElement("div");
+      ring.className = "firework-ring";
+      ring.style.left = `${x}px`;
+      ring.style.top = `${y}px`;
+      ring.style.borderColor = baseColor || "#ffd166";
+      stage.appendChild(ring);
+
+      // 2. ประกายดาวและสะเก็ดไฟ 360 องศา (360° Sparkles & Firework Particles)
+      const particleColors = [baseColor || "#ff6b8b", "#ffd166", "#ffffff", "#ff7aa8", "#48cae4", "#a8ff78", "#ff9f43"];
+      const starIcons = ["⭐", "✨", "🌟", "💥"];
+      const count = 22;
+
+      for (let i = 0; i < count; i++) {
+        const angle = (i / count) * 2 * Math.PI + (Math.random() * 0.4 - 0.2);
+        const dist = 45 + Math.random() * 85;
+        const tx = Math.cos(angle) * dist;
+        const ty = Math.sin(angle) * dist;
+        const color = particleColors[Math.floor(Math.random() * particleColors.length)];
+
+        if (i % 3 === 0) {
+          // ดาวประกายวิบวับ
+          const star = document.createElement("div");
+          star.className = "firework-star";
+          star.textContent = starIcons[Math.floor(Math.random() * starIcons.length)];
+          star.style.left = `${x}px`;
+          star.style.top = `${y}px`;
+          star.style.setProperty("--tx", `${tx}px`);
+          star.style.setProperty("--ty", `${ty}px`);
+          star.style.setProperty("--rot", `${(Math.random() * 360 - 180)}deg`);
+          star.style.fontSize = `${1.2 + Math.random() * 0.8}rem`;
+          stage.appendChild(star);
+          setTimeout(() => star.remove(), 950);
+        } else {
+          // สะเก็ดไฟเรืองแสง
+          const p = document.createElement("div");
+          p.className = "firework-particle";
+          const size = 6 + Math.random() * 10;
+          p.style.width = `${size}px`;
+          p.style.height = `${size}px`;
+          p.style.background = `radial-gradient(circle, #ffffff 0%, ${color} 70%)`;
+          p.style.boxShadow = `0 0 10px ${color}`;
+          p.style.left = `${x}px`;
+          p.style.top = `${y}px`;
+          p.style.setProperty("--tx", `${tx}px`);
+          p.style.setProperty("--ty", `${ty}px`);
+          stage.appendChild(p);
+          setTimeout(() => p.remove(), 900);
+        }
+      }
+
+      setTimeout(() => ring.remove(), 700);
     }
 
     function startBalloonGame() {
@@ -2114,6 +2280,11 @@
         balloon.textContent = item.l;
         balloon.dataset.letter = item.l;
         
+        // แสงสะท้อนขอบเงา 3D ด้านล่าง
+        const rimLight = document.createElement("div");
+        rimLight.className = "balloon-rim-light";
+        balloon.appendChild(rimLight);
+
         // สายลูกโป่ง
         const stringEl = document.createElement("div");
         stringEl.className = "balloon-string";
@@ -2156,9 +2327,20 @@
 
       if (item.l === balloonTarget.l) {
         balloonEl.classList.add("pop");
+
+        // คำนวณตำแหน่งจุดศูนย์กลางของลูกโป่งบนเวทีเพื่อระเบิดพลุ
+        const stage = $("#balloon-stage");
+        if (stage) {
+          const stageRect = stage.getBoundingClientRect();
+          const balloonRect = balloonEl.getBoundingClientRect();
+          const bx = balloonRect.left - stageRect.left + balloonRect.width / 2;
+          const by = balloonRect.top - stageRect.top + balloonRect.height / 2;
+          spawnFirework(stage, bx, by, balloonEl.style.backgroundColor);
+        }
+
         AudioSynth.playPop();
         AudioSynth.playSuccess();
-        Confetti.spawn(45);
+        Confetti.spawn(50);
 
         balloonScore += 1;
         $("#balloon-score").textContent = `คะแนน ${balloonScore}`;
@@ -2168,7 +2350,7 @@
           sendDesktopNotification("🎈 เก่งมากๆ!", `คุณเจาะลูกโป่งได้คะแนนสะสม ${balloonScore} คะแนนแล้ว`);
         }
 
-        setTimeout(startBalloonGame, 850);
+        setTimeout(startBalloonGame, 950);
       } else {
         AudioSynth.playFailure();
         balloonEl.classList.add("wrong");
