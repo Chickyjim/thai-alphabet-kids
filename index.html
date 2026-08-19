@@ -7,6 +7,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- MediaPipe Hands for Real-time AI Fingertip Tracking in AR Mode -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
   <style>
     :root {
       --ink: #243044;
@@ -1158,6 +1161,31 @@
       touch-action: none;
     }
 
+    /* ☝️ AR Fingertip Pen Indicator */
+    #ar-finger-cursor {
+      position: absolute;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #ffffff 0%, #00f0ff 65%, rgba(0, 240, 255, 0) 100%);
+      box-shadow: 0 0 24px #00f0ff, 0 0 45px #7c5cff;
+      border: 2.5px solid #ffffff;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 10;
+      display: none;
+      transition: transform 0.04s ease-out;
+    }
+
+    #ar-finger-cursor::after {
+      content: "✏️";
+      position: absolute;
+      top: -26px;
+      right: -24px;
+      font-size: 1.6rem;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.6));
+    }
+
     .trace-badge {
       position: absolute;
       bottom: 14px;
@@ -1633,6 +1661,7 @@
           <video id="ar-video" playsinline autoplay muted style="display: none;"></video>
           <img id="trace-pdf-img" src="trace_images/trace_01.png" alt="แบบฝึกเขียนพยัญชนะไทย" />
           <canvas id="trace-draw-canvas" width="900" height="580"></canvas>
+          <div id="ar-finger-cursor"></div>
           <div id="trace-progress-badge" class="trace-badge">ความสมบูรณ์ 0%</div>
         </div>
 
@@ -3046,12 +3075,126 @@
       sendDesktopNotification("✍️ เก่งมากๆ!", `คุณเขียนตัวอักษร ${traceTarget.l} สำเร็จเรียบร้อยแล้ว`);
     }
 
+    // --- AI Index Fingertip Pen Tracking for AR Mode ---
+    let mpHands = null;
+    let mpCamera = null;
+    let lastFingerX = null;
+    let lastFingerY = null;
+    let isMpInitialized = false;
+
+    function initMediaPipeHands() {
+      if (isMpInitialized || typeof Hands === "undefined") return;
+
+      try {
+        mpHands = new Hands({
+          locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+        });
+
+        mpHands.setOptions({
+          maxNumHands: 1,
+          modelComplexity: 1,
+          minDetectionConfidence: 0.5,
+          minTrackingConfidence: 0.5
+        });
+
+        mpHands.onResults(onHandResults);
+        isMpInitialized = true;
+      } catch (err) {
+        console.warn("MediaPipe Hands init error:", err);
+      }
+    }
+
+    function onHandResults(results) {
+      if (!isARMode) return;
+
+      const cursor = $("#ar-finger-cursor");
+      const drawCanvas = $("#trace-draw-canvas");
+      if (!cursor || !drawCanvas) return;
+
+      if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+        const landmarks = results.multiHandLandmarks[0];
+        // ปลายนิ้วชี้คือ Landmark Index 8 (INDEX_FINGER_TIP)
+        const tip = landmarks[8];
+        const pip = landmarks[6]; // ข้อต่อนิ้วชี้ PIP
+        const mcp = landmarks[5]; // โคนนิ้วชี้ MCP
+
+        // กล้องส่องกระจกกลับด้านแนวนอน: x = (1 - tip.x) * width
+        const cw = drawCanvas.width;
+        const ch = drawCanvas.height;
+        const fx = (1 - tip.x) * cw;
+        const fy = tip.y * ch;
+
+        // วางตำแหน่งตัวชี้ปากกานิ้วชี้เรืองแสง
+        const cRect = drawCanvas.getBoundingClientRect();
+        const displayX = (1 - tip.x) * cRect.width;
+        const displayY = tip.y * cRect.height;
+
+        cursor.style.display = "block";
+        cursor.style.left = `${displayX}px`;
+        cursor.style.top = `${displayY}px`;
+
+        // ตรวจสอบว่านิ้วชี้ชูขึ้นเขียน
+        const isPointing = tip.y < pip.y || Math.hypot(tip.x - mcp.x, tip.y - mcp.y) > 0.12;
+
+        if (isPointing) {
+          const ctx = drawCanvas.getContext("2d");
+          ctx.lineCap = "round";
+          ctx.lineJoin = "round";
+
+          if (lastFingerX !== null && lastFingerY !== null) {
+            const dist = Math.hypot(fx - lastFingerX, fy - lastFingerY);
+
+            // กรองอาการสั่นหรือการขยับเร็วเกินไป
+            if (dist > 3 && dist < 140) {
+              ctx.beginPath();
+              ctx.moveTo(lastFingerX, lastFingerY);
+              ctx.lineTo(fx, fy);
+
+              if (selectedColor === "rainbow") {
+                rainbowHue = (rainbowHue + 6) % 360;
+                ctx.strokeStyle = `hsl(${rainbowHue}, 100%, 55%)`;
+                ctx.shadowColor = `hsl(${rainbowHue}, 100%, 55%)`;
+                ctx.shadowBlur = 18;
+              } else {
+                ctx.strokeStyle = selectedColor;
+                ctx.shadowColor = selectedColor;
+                ctx.shadowBlur = 14;
+              }
+
+              ctx.lineWidth = 26;
+              ctx.stroke();
+
+              traceTotalLength += dist;
+              const cell = `${Math.floor(fx / 45)}_${Math.floor(fy / 45)}`;
+              traceVisitedCells.add(cell);
+
+              updateTraceCoverage();
+            }
+          } else {
+            const cell = `${Math.floor(fx / 45)}_${Math.floor(fy / 45)}`;
+            traceVisitedCells.add(cell);
+          }
+
+          lastFingerX = fx;
+          lastFingerY = fy;
+        } else {
+          lastFingerX = null;
+          lastFingerY = null;
+        }
+      } else {
+        cursor.style.display = "none";
+        lastFingerX = null;
+        lastFingerY = null;
+      }
+    }
+
     async function toggleARMode(enable) {
       isARMode = enable;
       const container = $("#trace-stage-container");
       const video = $("#ar-video");
       const touchBtn = $("#mode-touch-btn");
       const arBtn = $("#mode-ar-btn");
+      const cursor = $("#ar-finger-cursor");
 
       touchBtn.classList.toggle("active", !enable);
       arBtn.classList.toggle("active", enable);
@@ -3064,23 +3207,46 @@
             return;
           }
 
+          initMediaPipeHands();
+
           arStream = await navigator.mediaDevices.getUserMedia({
             video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } }
           });
           video.srcObject = arStream;
           video.style.display = "block";
           container.classList.add("ar-active");
-          $("#trace-feedback").textContent = "📷 โหมด AR: ส่องกล้องเห็นตัวเองแล้วใช้นิ้วลากเส้นกลางอากาศตามรอยได้เลย!";
+          $("#trace-feedback").textContent = "📷 โหมด AR ปากกานิ้วชี้: ชูนิ้วชี้ขึ้นมาแล้วลากเขียนกลางอากาศได้เลย! ☝️✨";
+
+          // เริ่มต้นการส่งเฟรมภาพไปยัง AI MediaPipe
+          if (typeof Camera !== "undefined" && mpHands) {
+            mpCamera = new Camera(video, {
+              onFrame: async () => {
+                if (isARMode && mpHands) {
+                  await mpHands.send({ image: video });
+                }
+              },
+              width: 1280,
+              height: 720
+            });
+            mpCamera.start();
+          }
         } catch (err) {
           console.warn("Camera AR permission or stream error:", err);
           alert("ไม่สามารถเข้าถึงกล้องได้ กรุณาอนุญาตการใช้กล้องเพื่อเล่นโหมด AR");
           toggleARMode(false);
         }
       } else {
+        if (mpCamera) {
+          mpCamera.stop();
+          mpCamera = null;
+        }
         if (arStream) {
           arStream.getTracks().forEach((track) => track.stop());
           arStream = null;
         }
+        if (cursor) cursor.style.display = "none";
+        lastFingerX = null;
+        lastFingerY = null;
         video.srcObject = null;
         video.style.display = "none";
         container.classList.remove("ar-active");
