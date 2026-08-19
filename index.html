@@ -2864,6 +2864,9 @@
       setTraceLetter(traceCurrentIndex, false);
     }
 
+    let traceVisitedCells = new Set();
+    let traceTotalLength = 0;
+
     function setupTraceCanvases() {
       const drawCanvas = $("#trace-draw-canvas");
       if (!drawCanvas) return;
@@ -2898,8 +2901,10 @@
         const pos = getPos(e);
         lastX = pos.x;
         lastY = pos.y;
-        traceDrawnPoints.push({ x: pos.x, y: pos.y });
         
+        const cell = `${Math.floor(pos.x / 45)}_${Math.floor(pos.y / 45)}`;
+        traceVisitedCells.add(cell);
+
         ctx.beginPath();
         ctx.arc(pos.x, pos.y, 11, 0, Math.PI * 2);
         ctx.fillStyle = selectedColor === "rainbow" ? `hsl(${rainbowHue}, 100%, 55%)` : selectedColor;
@@ -2910,30 +2915,34 @@
         if (!isDrawing) return;
         e.preventDefault();
         const pos = getPos(e);
+        const dist = Math.hypot(pos.x - lastX, pos.y - lastY);
         
-        ctx.beginPath();
-        ctx.moveTo(lastX, lastY);
-        ctx.lineTo(pos.x, pos.y);
-        
-        if (selectedColor === "rainbow") {
-          rainbowHue = (rainbowHue + 5) % 360;
-          ctx.strokeStyle = `hsl(${rainbowHue}, 100%, 55%)`;
-          ctx.shadowColor = `hsl(${rainbowHue}, 100%, 55%)`;
-          ctx.shadowBlur = 12;
-        } else {
-          ctx.strokeStyle = selectedColor;
-          ctx.shadowColor = selectedColor;
-          ctx.shadowBlur = isARMode ? 14 : 4;
-        }
-        
-        ctx.lineWidth = isARMode ? 24 : 22;
-        ctx.stroke();
+        if (dist > 2) {
+          ctx.beginPath();
+          ctx.moveTo(lastX, lastY);
+          ctx.lineTo(pos.x, pos.y);
+          
+          if (selectedColor === "rainbow") {
+            rainbowHue = (rainbowHue + 5) % 360;
+            ctx.strokeStyle = `hsl(${rainbowHue}, 100%, 55%)`;
+            ctx.shadowColor = `hsl(${rainbowHue}, 100%, 55%)`;
+            ctx.shadowBlur = 12;
+          } else {
+            ctx.strokeStyle = selectedColor;
+            ctx.shadowColor = selectedColor;
+            ctx.shadowBlur = isARMode ? 14 : 4;
+          }
+          
+          ctx.lineWidth = isARMode ? 24 : 22;
+          ctx.stroke();
 
-        lastX = pos.x;
-        lastY = pos.y;
-        traceDrawnPoints.push({ x: pos.x, y: pos.y });
+          traceTotalLength += dist;
+          const cell = `${Math.floor(pos.x / 45)}_${Math.floor(pos.y / 45)}`;
+          traceVisitedCells.add(cell);
 
-        if (traceDrawnPoints.length % 5 === 0) {
+          lastX = pos.x;
+          lastY = pos.y;
+
           updateTraceCoverage();
         }
       };
@@ -2971,7 +2980,7 @@
       const select = $("#trace-letter-select");
       if (select) select.value = traceCurrentIndex;
 
-      // โหลดรูปภาพแบบฝึกเขียนแท้จาก PDF
+      // โหลดรูปภาพแบบฝึกเขียนแท้จาก PDF / โฟลเดอร์ กฮ
       const padNum = String(traceCurrentIndex + 1).padStart(2, "0");
       const img = $("#trace-pdf-img");
       if (img) {
@@ -2992,7 +3001,8 @@
         ctx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
         delete drawCanvas.dataset.awarded;
       }
-      traceDrawnPoints = [];
+      traceVisitedCells.clear();
+      traceTotalLength = 0;
       $("#trace-progress-badge").textContent = "ความสมบูรณ์ 0%";
     }
 
@@ -3000,9 +3010,20 @@
       const drawCanvas = $("#trace-draw-canvas");
       if (!drawCanvas) return;
 
-      const count = traceDrawnPoints.length;
-      const percent = Math.min(100, Math.round((count / 36) * 100));
-      $("#trace-progress-badge").textContent = `ความสมบูรณ์ ${percent}%`;
+      // คำนวณความสมบูรณ์อย่างสมจริง: 60% จากพื้นที่ช่องตารางที่นิ้วลากผ่าน + 40% จากระยะทางลายเส้น
+      const cellsScore = Math.min(60, (traceVisitedCells.size / 16) * 60);
+      const lengthScore = Math.min(40, (traceTotalLength / 550) * 40);
+      const percent = Math.min(100, Math.round(cellsScore + lengthScore));
+
+      if (percent < 35) {
+        $("#trace-progress-badge").textContent = `ความสมบูรณ์ ${percent}% ✏️`;
+      } else if (percent < 80) {
+        $("#trace-progress-badge").textContent = `ลากเส้นสวยงาม ${percent}% 🌟`;
+      } else if (percent < 100) {
+        $("#trace-progress-badge").textContent = `ใกล้เสร็จแล้ว! ${percent}% 🚀`;
+      } else {
+        $("#trace-progress-badge").textContent = `🎉 ยอดเยี่ยม! 100%`;
+      }
 
       if (percent >= 100 && !drawCanvas.dataset.awarded) {
         drawCanvas.dataset.awarded = "true";
