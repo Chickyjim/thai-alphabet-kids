@@ -1093,14 +1093,10 @@
     .trace-stage-container {
       position: relative;
       width: 100%;
-      max-width: 860px;
-      height: min(560px, 75vh);
+      max-width: 900px;
+      height: min(580px, 76vh);
       margin: 0 auto 16px;
       background: #ffffff;
-      background-image: 
-        linear-gradient(rgba(124, 92, 255, 0.08) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(124, 92, 255, 0.08) 1px, transparent 1px);
-      background-size: 32px 32px;
       border-radius: 26px;
       border: 4px solid var(--line);
       box-shadow: 0 16px 36px rgba(36, 48, 68, 0.1);
@@ -1108,6 +1104,9 @@
       touch-action: none;
       user-select: none;
       -webkit-user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .trace-stage-container.ar-active {
@@ -1128,14 +1127,24 @@
       opacity: 0.85;
     }
 
-    #trace-guide-canvas {
+    #trace-pdf-img {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
+      object-fit: contain;
       z-index: 2;
       pointer-events: none;
+      background: #ffffff;
+      transition: opacity 0.25s ease;
+    }
+
+    .trace-stage-container.ar-active #trace-pdf-img {
+      opacity: 0.65;
+      background: transparent;
+      mix-blend-mode: screen;
+      filter: invert(1) drop-shadow(0 0 12px #00f0ff);
     }
 
     #trace-draw-canvas {
@@ -1144,7 +1153,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      z-index: 3;
+      z-index: 4;
       cursor: crosshair;
       touch-action: none;
     }
@@ -1619,11 +1628,11 @@
 
         <div id="trace-feedback" style="text-align: center; font-weight: 700; font-size: 1.2rem; min-height: 28px; margin-bottom: 12px; color: var(--plum);">✍️ ใช้นิ้วลากเส้นตามรอยประตัวอักษรด้านล่างได้เลย!</div>
 
-        <!-- กระดานวาดเขียน (Canvas Stage with grid paper & AR video background) -->
+        <!-- กระดานวาดเขียน (Canvas Stage with genuine worksheet from PDF & AR video) -->
         <div class="trace-stage-container" id="trace-stage-container">
           <video id="ar-video" playsinline autoplay muted style="display: none;"></video>
-          <canvas id="trace-guide-canvas" width="600" height="460"></canvas>
-          <canvas id="trace-draw-canvas" width="600" height="460"></canvas>
+          <img id="trace-pdf-img" src="trace_images/trace_01.png" alt="แบบฝึกเขียนพยัญชนะไทย" />
+          <canvas id="trace-draw-canvas" width="900" height="580"></canvas>
           <div id="trace-progress-badge" class="trace-badge">ความสมบูรณ์ 0%</div>
         </div>
 
@@ -2824,7 +2833,7 @@
       }
     }
 
-    // --- 11. เกมฝึกเขียนพยัญชนะ ก-ฮ (Handwriting Tracing & AR Mode) ---
+    // --- 11. เกมฝึกเขียนพยัญชนะ ก-ฮ (Handwriting Tracing from PDF Worksheet & AR Mode) ---
     let traceCurrentIndex = 0;
     let traceTarget = letters[0];
     let isDrawing = false;
@@ -2833,7 +2842,6 @@
     let arStream = null;
     let isARMode = false;
     let traceDrawnPoints = [];
-    let guidePixelCount = 0;
     let isTraceSetupDone = false;
 
     function initTraceGame() {
@@ -2857,17 +2865,14 @@
     }
 
     function setupTraceCanvases() {
-      const guideCanvas = $("#trace-guide-canvas");
       const drawCanvas = $("#trace-draw-canvas");
-      if (!guideCanvas || !drawCanvas) return;
+      if (!drawCanvas) return;
 
       const container = $("#trace-stage-container");
       const rect = container.getBoundingClientRect();
-      const w = Math.floor(rect.width || 600);
-      const h = Math.floor(rect.height || 460);
+      const w = Math.floor(rect.width || 900);
+      const h = Math.floor(rect.height || 580);
 
-      guideCanvas.width = w;
-      guideCanvas.height = h;
       drawCanvas.width = w;
       drawCanvas.height = h;
 
@@ -2928,7 +2933,7 @@
         lastY = pos.y;
         traceDrawnPoints.push({ x: pos.x, y: pos.y });
 
-        if (traceDrawnPoints.length % 6 === 0) {
+        if (traceDrawnPoints.length % 5 === 0) {
           updateTraceCoverage();
         }
       };
@@ -2947,12 +2952,9 @@
       window.addEventListener("resize", () => {
         if ($("#trace").classList.contains("active")) {
           const r = container.getBoundingClientRect();
-          if (r.width > 0 && r.height > 0 && (r.width !== guideCanvas.width || r.height !== guideCanvas.height)) {
-            guideCanvas.width = Math.floor(r.width);
-            guideCanvas.height = Math.floor(r.height);
+          if (r.width > 0 && r.height > 0 && (r.width !== drawCanvas.width || r.height !== drawCanvas.height)) {
             drawCanvas.width = Math.floor(r.width);
             drawCanvas.height = Math.floor(r.height);
-            renderGuideLetter();
           }
         }
       });
@@ -2964,219 +2966,23 @@
 
       applyPhoto($("#trace-picture"), traceTarget);
       $("#trace-target-title").textContent = speechText(traceTarget);
-      $("#trace-feedback").textContent = `✍️ ใช้นิ้วลากเส้นตามรอยประตัวอักษร "${traceTarget.l}" ด้านล่างได้เลย!`;
+      $("#trace-feedback").textContent = `✍️ ใช้นิ้วลากเส้นจากจุดสีเขียว 🟢 ไปตามลูกศรจนถึงจุดสีแดง 🔴 (${speechText(traceTarget)})`;
       
       const select = $("#trace-letter-select");
       if (select) select.value = traceCurrentIndex;
 
+      // โหลดรูปภาพแบบฝึกเขียนแท้จาก PDF
+      const padNum = String(traceCurrentIndex + 1).padStart(2, "0");
+      const img = $("#trace-pdf-img");
+      if (img) {
+        img.src = `trace_images/trace_${padNum}.png`;
+      }
+
       clearTraceDraw();
-      renderGuideLetter();
 
       if (shouldSpeak) {
         speak(traceTarget);
       }
-    }
-
-    // ข้อมูลจุดเริ่มต้นและลูกศรบอกทิศทางการเขียนพยัญชนะไทยทั้ง 44 ตัว
-    const thaiStrokeData = {
-      "ก": { start: { rx: 0.18, ry: 0.90 }, arrows: [{ rx: 0.20, ry: 0.45, dir: "⬆️", label: "① ลากขึ้น" }, { rx: 0.50, ry: 0.12, dir: "↪️", label: "② ทำปากโค้ง" }, { rx: 0.82, ry: 0.55, dir: "⬇️", label: "③ ลากลง" }] },
-      "ข": { start: { rx: 0.26, ry: 0.22 }, arrows: [{ rx: 0.35, ry: 0.16, dir: "🔄", label: "① ม้วนหัวกลม" }, { rx: 0.22, ry: 0.55, dir: "⬇️", label: "② ลากลง" }, { rx: 0.52, ry: 0.90, dir: "➡️", label: "③ ลากขวา" }, { rx: 0.82, ry: 0.50, dir: "⬆️", label: "④ ลากขึ้น" }] },
-      "ฃ": { start: { rx: 0.26, ry: 0.22 }, arrows: [{ rx: 0.35, ry: 0.14, dir: "〽️", label: "① ม้วนหัวหยัก" }, { rx: 0.22, ry: 0.55, dir: "⬇️", label: "② ลากลง" }, { rx: 0.52, ry: 0.90, dir: "➡️", label: "③ ลากขวา" }, { rx: 0.82, ry: 0.50, dir: "⬆️", label: "④ ลากขึ้น" }] },
-      "ค": { start: { rx: 0.38, ry: 0.26 }, arrows: [{ rx: 0.48, ry: 0.20, dir: "🔄", label: "① ม้วนหัวออก" }, { rx: 0.18, ry: 0.60, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.52, ry: 0.12, dir: "↪️", label: "③ โค้งหลังคา" }, { rx: 0.84, ry: 0.60, dir: "⬇️", label: "④ ลากลง" }] },
-      "ฅ": { start: { rx: 0.38, ry: 0.26 }, arrows: [{ rx: 0.48, ry: 0.20, dir: "🔄", label: "① ม้วนหัวออก" }, { rx: 0.18, ry: 0.60, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.52, ry: 0.12, dir: "〽️", label: "③ หยักหลังคา" }, { rx: 0.84, ry: 0.60, dir: "⬇️", label: "④ ลากลง" }] },
-      "ฆ": { start: { rx: 0.28, ry: 0.24 }, arrows: [{ rx: 0.38, ry: 0.18, dir: "🔄", label: "① ม้วนหัวหยัก" }, { rx: 0.20, ry: 0.60, dir: "⬇️", label: "② ลากลง" }, { rx: 0.55, ry: 0.80, dir: "🔄", label: "③ ม้วนปมล่าง" }, { rx: 0.84, ry: 0.50, dir: "⬆️", label: "④ ลากขึ้น" }] },
-      "ง": { start: { rx: 0.48, ry: 0.22 }, arrows: [{ rx: 0.58, ry: 0.18, dir: "🔄", label: "① ม้วนหัวกลม" }, { rx: 0.48, ry: 0.55, dir: "⬇️", label: "② ลากลงตรง" }, { rx: 0.22, ry: 0.82, dir: "↙️", label: "③ เฉียงหางขึ้นซ้าย" }] },
-      "จ": { start: { rx: 0.48, ry: 0.22 }, arrows: [{ rx: 0.58, ry: 0.18, dir: "🔄", label: "① ม้วนหัวกลม" }, { rx: 0.24, ry: 0.65, dir: "↙️", label: "② ลากลงเฉียง" }, { rx: 0.75, ry: 0.50, dir: "↪️", label: "③ โค้งหลังคาขวา" }] },
-      "ฉ": { start: { rx: 0.30, ry: 0.22 }, arrows: [{ rx: 0.40, ry: 0.18, dir: "🔄", label: "① ม้วนหัวกลม" }, { rx: 0.22, ry: 0.60, dir: "⬇️", label: "② ลากลง" }, { rx: 0.50, ry: 0.84, dir: "🔄", label: "③ ม้วนปมล่าง" }, { rx: 0.80, ry: 0.45, dir: "↪️", label: "④ โค้งปิดบน" }] },
-      "ช": { start: { rx: 0.28, ry: 0.22 }, arrows: [{ rx: 0.38, ry: 0.18, dir: "🔄", label: "① ม้วนหัวกลม" }, { rx: 0.22, ry: 0.58, dir: "⬇️", label: "② ลากลง" }, { rx: 0.50, ry: 0.90, dir: "➡️", label: "③ ลากขวา" }, { rx: 0.80, ry: 0.40, dir: "⬆️", label: "④ ลากขึ้นตวัดหาง" }] },
-      "ซ": { start: { rx: 0.28, ry: 0.22 }, arrows: [{ rx: 0.38, ry: 0.16, dir: "〽️", label: "① ม้วนหัวหยัก" }, { rx: 0.22, ry: 0.58, dir: "⬇️", label: "② ลากลง" }, { rx: 0.50, ry: 0.90, dir: "➡️", label: "③ ลากขวา" }, { rx: 0.80, ry: 0.40, dir: "⬆️", label: "④ ลากขึ้นตวัดหาง" }] },
-      "ฌ": { start: { rx: 0.24, ry: 0.32 }, arrows: [{ rx: 0.32, ry: 0.25, dir: "🔄", label: "① ม้วนหัว" }, { rx: 0.18, ry: 0.65, dir: "⬇️", label: "② ลากลง" }, { rx: 0.52, ry: 0.78, dir: "🔄", label: "③ ผูกปมกลาง" }, { rx: 0.82, ry: 0.45, dir: "⬆️", label: "④ ลากขึ้นขวา" }] },
-      "ญ": { start: { rx: 0.26, ry: 0.32 }, arrows: [{ rx: 0.35, ry: 0.25, dir: "🔄", label: "① ม้วนหัว" }, { rx: 0.18, ry: 0.65, dir: "⬇️", label: "② ลากลง" }, { rx: 0.52, ry: 0.12, dir: "↪️", label: "③ โค้งบน" }, { rx: 0.84, ry: 0.60, dir: "⬇️", label: "④ ลากลงขวา" }] },
-      "ฎ": { start: { rx: 0.38, ry: 0.24 }, arrows: [{ rx: 0.48, ry: 0.18, dir: "🔄", label: "① ม้วนหัวออก" }, { rx: 0.18, ry: 0.55, dir: "⬇️", label: "② ลากลง" }, { rx: 0.52, ry: 0.12, dir: "↪️", label: "③ โค้งบน" }, { rx: 0.82, ry: 0.85, dir: "➰", label: "④ ลากลงม้วนหาง" }] },
-      "ฏ": { start: { rx: 0.38, ry: 0.24 }, arrows: [{ rx: 0.48, ry: 0.18, dir: "🔄", label: "① ม้วนหัวออก" }, { rx: 0.18, ry: 0.55, dir: "⬇️", label: "② ลากลง" }, { rx: 0.52, ry: 0.12, dir: "〽️", label: "③ หลังคาหยัก" }, { rx: 0.82, ry: 0.85, dir: "➰", label: "④ ลากลงม้วนหาง" }] },
-      "ฐ": { start: { rx: 0.30, ry: 0.22 }, arrows: [{ rx: 0.40, ry: 0.18, dir: "🔄", label: "① ม้วนหัว" }, { rx: 0.20, ry: 0.55, dir: "⬇️", label: "② ลากลง" }, { rx: 0.52, ry: 0.12, dir: "↪️", label: "③ โค้งบน" }, { rx: 0.82, ry: 0.60, dir: "⬇️", label: "④ ลากลงขวา" }] },
-      "ฑ": { start: { rx: 0.30, ry: 0.26 }, arrows: [{ rx: 0.40, ry: 0.20, dir: "〽️", label: "① ม้วนหัวหยัก" }, { rx: 0.20, ry: 0.60, dir: "⬇️", label: "② ลากลง" }, { rx: 0.50, ry: 0.12, dir: "↪️", label: "③ โค้งบน" }, { rx: 0.84, ry: 0.60, dir: "⬇️", label: "④ ลากลง" }] },
-      "ฒ": { start: { rx: 0.26, ry: 0.32 }, arrows: [{ rx: 0.34, ry: 0.24, dir: "〽️", label: "① ม้วนหัวหยัก" }, { rx: 0.18, ry: 0.65, dir: "⬇️", label: "② ลากลง" }, { rx: 0.52, ry: 0.78, dir: "🔄", label: "③ ผูกปมกลาง" }, { rx: 0.82, ry: 0.45, dir: "⬆️", label: "④ ลากขึ้นขวา" }] },
-      "ณ": { start: { rx: 0.24, ry: 0.32 }, arrows: [{ rx: 0.34, ry: 0.24, dir: "🔄", label: "① ม้วนหัว" }, { rx: 0.18, ry: 0.65, dir: "⬇️", label: "② ลากลง" }, { rx: 0.52, ry: 0.78, dir: "🔄", label: "③ ผูกปมล่าง" }, { rx: 0.84, ry: 0.45, dir: "⬆️", label: "④ ลากขึ้นขวา" }] },
-      "ด": { start: { rx: 0.42, ry: 0.24 }, arrows: [{ rx: 0.52, ry: 0.18, dir: "🔄", label: "① ม้วนหัวเข้า" }, { rx: 0.22, ry: 0.60, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.52, ry: 0.12, dir: "↪️", label: "③ โค้งหลังคา" }, { rx: 0.84, ry: 0.60, dir: "⬇️", label: "④ ลากลงขวา" }] },
-      "ต": { start: { rx: 0.42, ry: 0.24 }, arrows: [{ rx: 0.52, ry: 0.18, dir: "🔄", label: "① ม้วนหัวเข้า" }, { rx: 0.22, ry: 0.60, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.52, ry: 0.12, dir: "〽️", label: "③ หลังคาหยัก" }, { rx: 0.84, ry: 0.60, dir: "⬇️", label: "④ ลากลงขวา" }] },
-      "ถ": { start: { rx: 0.44, ry: 0.80 }, arrows: [{ rx: 0.52, ry: 0.72, dir: "🔄", label: "① ม้วนหัวล่าง" }, { rx: 0.22, ry: 0.40, dir: "⬆️", label: "② ลากขึ้นซ้าย" }, { rx: 0.50, ry: 0.12, dir: "↪️", label: "③ ทำปากโค้ง" }, { rx: 0.84, ry: 0.60, dir: "⬇️", label: "④ ลากลงขวา" }] },
-      "ท": { start: { rx: 0.38, ry: 0.24 }, arrows: [{ rx: 0.48, ry: 0.18, dir: "🔄", label: "① ม้วนหัวออก" }, { rx: 0.20, ry: 0.60, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.52, ry: 0.12, dir: "↪️", label: "③ โค้งบน" }, { rx: 0.84, ry: 0.60, dir: "⬇️", label: "④ ลากลงขวา" }] },
-      "ธ": { start: { rx: 0.22, ry: 0.88 }, arrows: [{ rx: 0.22, ry: 0.45, dir: "⬆️", label: "① ลากขึ้นตรง" }, { rx: 0.52, ry: 0.12, dir: "↪️", label: "② โค้งบน" }, { rx: 0.82, ry: 0.55, dir: "⬇️", label: "③ ลากลงขวา" }, { rx: 0.52, ry: 0.88, dir: "⬅️", label: "④ ลากฐานล่าง" }] },
-      "น": { start: { rx: 0.26, ry: 0.22 }, arrows: [{ rx: 0.36, ry: 0.18, dir: "🔄", label: "① ม้วนหัวบน" }, { rx: 0.20, ry: 0.60, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.55, ry: 0.82, dir: "🔄", label: "③ ม้วนปมหลัง" }, { rx: 0.82, ry: 0.45, dir: "⬆️", label: "④ ลากขึ้นขวา" }] },
-      "บ": { start: { rx: 0.26, ry: 0.22 }, arrows: [{ rx: 0.36, ry: 0.18, dir: "🔄", label: "① ม้วนหัวกลม" }, { rx: 0.20, ry: 0.60, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.52, ry: 0.90, dir: "➡️", label: "③ ลากฐานล่าง" }, { rx: 0.84, ry: 0.50, dir: "⬆️", label: "④ ลากขึ้นขวา" }] },
-      "ป": { start: { rx: 0.26, ry: 0.32 }, arrows: [{ rx: 0.36, ry: 0.26, dir: "🔄", label: "① ม้วนหัวกลม" }, { rx: 0.20, ry: 0.65, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.52, ry: 0.92, dir: "➡️", label: "③ ลากฐานล่าง" }, { rx: 0.84, ry: 0.25, dir: "⬆️", label: "④ ลากขึ้นหางยาว" }] },
-      "ผ": { start: { rx: 0.30, ry: 0.22 }, arrows: [{ rx: 0.40, ry: 0.18, dir: "🔄", label: "① ม้วนหัวเข้า" }, { rx: 0.20, ry: 0.60, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.50, ry: 0.50, dir: "〽️", label: "③ หยักฟันปลา" }, { rx: 0.84, ry: 0.50, dir: "⬆️", label: "④ ลากขึ้นขวา" }] },
-      "ฝ": { start: { rx: 0.30, ry: 0.32 }, arrows: [{ rx: 0.40, ry: 0.26, dir: "🔄", label: "① ม้วนหัวเข้า" }, { rx: 0.20, ry: 0.65, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.50, ry: 0.55, dir: "〽️", label: "③ หยักฟันปลา" }, { rx: 0.84, ry: 0.25, dir: "⬆️", label: "④ ลากขึ้นหางยาว" }] },
-      "พ": { start: { rx: 0.24, ry: 0.22 }, arrows: [{ rx: 0.34, ry: 0.18, dir: "🔄", label: "① ม้วนหัวออก" }, { rx: 0.18, ry: 0.60, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.50, ry: 0.20, dir: "〽️", label: "③ ลากขึ้น-ลงหยักแหลม" }, { rx: 0.84, ry: 0.50, dir: "⬆️", label: "④ ลากขึ้นขวา" }] },
-      "ฟ": { start: { rx: 0.24, ry: 0.32 }, arrows: [{ rx: 0.34, ry: 0.26, dir: "🔄", label: "① ม้วนหัวออก" }, { rx: 0.18, ry: 0.65, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.50, ry: 0.30, dir: "〽️", label: "③ ลากขึ้น-ลงหยักแหลม" }, { rx: 0.84, ry: 0.22, dir: "⬆️", label: "④ ลากขึ้นหางยาว" }] },
-      "ภ": { start: { rx: 0.42, ry: 0.80 }, arrows: [{ rx: 0.52, ry: 0.72, dir: "🔄", label: "① ม้วนหัวล่าง" }, { rx: 0.20, ry: 0.40, dir: "⬆️", label: "② ลากขึ้นซ้าย" }, { rx: 0.52, ry: 0.12, dir: "↪️", label: "③ โค้งหลังคา" }, { rx: 0.84, ry: 0.60, dir: "⬇️", label: "④ ลากลงขวา" }] },
-      "ม": { start: { rx: 0.26, ry: 0.22 }, arrows: [{ rx: 0.36, ry: 0.18, dir: "🔄", label: "① ม้วนหัวบน" }, { rx: 0.20, ry: 0.60, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.50, ry: 0.78, dir: "🔄", label: "③ ม้วนปมหน้า" }, { rx: 0.82, ry: 0.45, dir: "⬆️", label: "④ ลากขึ้นขวา" }] },
-      "ย": { start: { rx: 0.28, ry: 0.24 }, arrows: [{ rx: 0.38, ry: 0.18, dir: "🔄", label: "① ม้วนหัวบน" }, { rx: 0.20, ry: 0.55, dir: "〽️", label: "② หยักอก" }, { rx: 0.52, ry: 0.90, dir: "➡️", label: "③ ลากฐานล่าง" }, { rx: 0.84, ry: 0.50, dir: "⬆️", label: "④ ลากขึ้นขวา" }] },
-      "ร": { start: { rx: 0.35, ry: 0.78 }, arrows: [{ rx: 0.45, ry: 0.72, dir: "🔄", label: "① ม้วนหัวล่าง" }, { rx: 0.35, ry: 0.35, dir: "⬆️", label: "② ลากขึ้นตรง" }, { rx: 0.65, ry: 0.14, dir: "↪️", label: "③ โค้งหลังคาขวา" }] },
-      "ล": { start: { rx: 0.26, ry: 0.80 }, arrows: [{ rx: 0.36, ry: 0.72, dir: "🔄", label: "① ม้วนหัวล่าง" }, { rx: 0.20, ry: 0.40, dir: "⬆️", label: "② ลากขึ้นซ้าย" }, { rx: 0.52, ry: 0.12, dir: "↪️", label: "③ โค้งบน" }, { rx: 0.84, ry: 0.60, dir: "⬇️", label: "④ ลากลงขวา" }] },
-      "ว": { start: { rx: 0.35, ry: 0.78 }, arrows: [{ rx: 0.45, ry: 0.72, dir: "🔄", label: "① ม้วนหัวล่าง" }, { rx: 0.35, ry: 0.35, dir: "⬆️", label: "② ลากขึ้นตรง" }, { rx: 0.65, ry: 0.14, dir: "↪️", label: "③ โค้งหลังคาซ้าย" }] },
-      "ศ": { start: { rx: 0.38, ry: 0.32 }, arrows: [{ rx: 0.48, ry: 0.26, dir: "🔄", label: "① ม้วนหัวออก" }, { rx: 0.20, ry: 0.65, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.52, ry: 0.18, dir: "↪️", label: "③ โค้งบน" }, { rx: 0.84, ry: 0.18, dir: "↗️", label: "④ ขีดหางชี้ขึ้น" }] },
-      "ษ": { start: { rx: 0.26, ry: 0.24 }, arrows: [{ rx: 0.36, ry: 0.18, dir: "🔄", label: "① ม้วนหัวกลม" }, { rx: 0.20, ry: 0.60, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.52, ry: 0.55, dir: "〽️", label: "③ ขีดไส้กลาง" }, { rx: 0.84, ry: 0.50, dir: "⬆️", label: "④ ลากขึ้นขวา" }] },
-      "ส": { start: { rx: 0.26, ry: 0.80 }, arrows: [{ rx: 0.36, ry: 0.72, dir: "🔄", label: "① ม้วนหัวล่าง" }, { rx: 0.20, ry: 0.40, dir: "⬆️", label: "② ลากขึ้นซ้าย" }, { rx: 0.52, ry: 0.18, dir: "↪️", label: "③ โค้งบน" }, { rx: 0.84, ry: 0.16, dir: "↗️", label: "④ ขีดหางยาว" }] },
-      "ห": { start: { rx: 0.26, ry: 0.22 }, arrows: [{ rx: 0.36, ry: 0.18, dir: "🔄", label: "① ม้วนหัวหน้า" }, { rx: 0.20, ry: 0.60, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.60, ry: 0.24, dir: "🔄", label: "③ ม้วนปมบนขวา" }, { rx: 0.82, ry: 0.65, dir: "⬇️", label: "④ ลากลงขวา" }] },
-      "ฬ": { start: { rx: 0.24, ry: 0.24 }, arrows: [{ rx: 0.34, ry: 0.18, dir: "🔄", label: "① ม้วนหัวออก" }, { rx: 0.18, ry: 0.60, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.50, ry: 0.20, dir: "〽️", label: "③ ลากหยักแหลม" }, { rx: 0.84, ry: 0.16, dir: "➰", label: "④ ลากขึ้นม้วนหาง" }] },
-      "อ": { start: { rx: 0.42, ry: 0.24 }, arrows: [{ rx: 0.52, ry: 0.18, dir: "🔄", label: "① ม้วนหัวบน" }, { rx: 0.22, ry: 0.60, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.52, ry: 0.12, dir: "↪️", label: "③ โค้งหลังคา" }, { rx: 0.84, ry: 0.60, dir: "⬇️", label: "④ ลากลงขวา" }] },
-      "ฮ": { start: { rx: 0.42, ry: 0.28 }, arrows: [{ rx: 0.52, ry: 0.22, dir: "🔄", label: "① ม้วนหัวบน" }, { rx: 0.22, ry: 0.65, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.52, ry: 0.16, dir: "↪️", label: "③ โค้งหลังคา" }, { rx: 0.84, ry: 0.14, dir: "➰", label: "④ ตวัดม้วนหางบน" }] }
-    };
-
-    function renderGuideLetter() {
-      const canvas = $("#trace-guide-canvas");
-      if (!canvas) return;
-      const ctx = canvas.getContext("2d");
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      const w = canvas.width;
-      const h = canvas.height;
-
-      ctx.save();
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-
-      // ขนาดตัวอักษรใหญ่สะใจเกือบเต็มจอ (88% ของเวที)
-      const fontSize = Math.min(w * 0.88, h * 0.88, 480);
-      ctx.font = `bold ${fontSize}px "Sarabun", "Mali", sans-serif`;
-
-      const cx = w / 2;
-      const cy = h / 2 + 10;
-
-      if (isARMode) {
-        // ในโหมด AR: เรืองแสงนีออนสีฟ้าสดใสลอยกลางอากาศ
-        ctx.strokeStyle = "rgba(0, 240, 255, 0.95)";
-        ctx.lineWidth = 18;
-        ctx.setLineDash([16, 16]);
-        ctx.shadowColor = "#00f0ff";
-        ctx.shadowBlur = 22;
-        ctx.strokeText(traceTarget.l, cx, cy);
-
-        ctx.fillStyle = "rgba(0, 240, 255, 0.18)";
-        ctx.fillText(traceTarget.l, cx, cy);
-      } else {
-        // ในโหมดจอสัมผัส: เส้นประคมชัดสองชั้นพร้อมพื้นหลังสมุดคัดลายมือ
-        ctx.strokeStyle = "#e2e8f0";
-        ctx.lineWidth = 36;
-        ctx.setLineDash([]);
-        ctx.strokeText(traceTarget.l, cx, cy);
-
-        ctx.strokeStyle = "#7c5cff";
-        ctx.lineWidth = 8;
-        ctx.setLineDash([16, 14]);
-        ctx.shadowColor = "rgba(124, 92, 255, 0.35)";
-        ctx.shadowBlur = 10;
-        ctx.strokeText(traceTarget.l, cx, cy);
-
-        ctx.fillStyle = "rgba(124, 92, 255, 0.05)";
-        ctx.fillText(traceTarget.l, cx, cy);
-      }
-
-      ctx.restore();
-
-      // วาดจุดเริ่มต้น และลูกศรบอกทิศทางการเขียน (Stroke Guides)
-      renderStrokeGuides(ctx, traceTarget.l, cx, cy, fontSize);
-
-      calculateGuidePixels();
-    }
-
-    function renderStrokeGuides(ctx, letter, cx, cy, fontSize) {
-      const guide = thaiStrokeData[letter];
-      if (!guide) return;
-
-      const halfW = (fontSize * 0.72) / 2;
-      const halfH = (fontSize * 0.88) / 2;
-      const bx = cx - halfW;
-      const by = cy - halfH;
-
-      ctx.save();
-
-      // 1. วาดลูกศรบอกทิศทางแต่ละสเต็ป (Step Direction Arrows)
-      if (guide.arrows) {
-        guide.arrows.forEach((ar) => {
-          const ax = bx + ar.rx * (halfW * 2);
-          const ay = by + ar.ry * (halfH * 2);
-
-          // ป้ายพื้นหลังลูกศร
-          ctx.beginPath();
-          ctx.arc(ax, ay, 20, 0, Math.PI * 2);
-          ctx.fillStyle = isARMode ? "rgba(17, 24, 39, 0.88)" : "rgba(255, 255, 255, 0.95)";
-          ctx.shadowColor = "rgba(0,0,0,0.25)";
-          ctx.shadowBlur = 6;
-          ctx.fill();
-          ctx.lineWidth = 2.8;
-          ctx.strokeStyle = isARMode ? "#00f0ff" : "#ff9f43";
-          ctx.stroke();
-
-          // ข้อความลูกศรและสัญลักษณ์
-          ctx.font = 'bold 16px "Sarabun", sans-serif';
-          ctx.fillStyle = isARMode ? "#00f0ff" : "#d97706";
-          ctx.textAlign = "center";
-          ctx.textBaseline = "middle";
-          ctx.fillText(ar.dir, ax, ay);
-        });
-      }
-
-      // 2. วาดจุดเริ่มต้น 🟢 (Numbered Start Point Beacon)
-      if (guide.start) {
-        const sx = bx + guide.start.rx * (halfW * 2);
-        const sy = by + guide.start.ry * (halfH * 2);
-
-        // วงรัศมีระลอกคลื่นเรืองแสง
-        ctx.beginPath();
-        ctx.arc(sx, sy, 26, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(56, 217, 169, 0.35)";
-        ctx.fill();
-
-        // วงกลมจุดเริ่มสีเขียวสด
-        ctx.beginPath();
-        ctx.arc(sx, sy, 18, 0, Math.PI * 2);
-        ctx.fillStyle = "#12b886";
-        ctx.shadowColor = "#12b886";
-        ctx.shadowBlur = 12;
-        ctx.fill();
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = "#ffffff";
-        ctx.stroke();
-
-        // สัญลักษณ์ "①" เริ่มต้น
-        ctx.font = 'bold 16px "Sarabun", sans-serif';
-        ctx.fillStyle = "#ffffff";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText("①", sx, sy);
-
-        // ป้ายข้อความ "เริ่มตรงนี้"
-        ctx.font = 'bold 13px "Sarabun", sans-serif';
-        const labelText = "เริ่มตรงนี้";
-        const tw = ctx.measureText(labelText).width + 14;
-        
-        ctx.beginPath();
-        ctx.roundRect(sx - tw / 2, sy + 22, tw, 24, 10);
-        ctx.fillStyle = "#12b886";
-        ctx.shadowColor = "rgba(0,0,0,0.2)";
-        ctx.shadowBlur = 4;
-        ctx.fill();
-        ctx.fillStyle = "#ffffff";
-        ctx.fillText(labelText, sx, sy + 34);
-      }
-
-      ctx.restore();
-    }
-
-    function calculateGuidePixels() {
-      const canvas = $("#trace-guide-canvas");
-      if (!canvas) return;
-      const ctx = canvas.getContext("2d");
-      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-      
-      let count = 0;
-      for (let i = 3; i < imgData.length; i += 16) {
-        if (imgData[i] > 30) count++;
-      }
-      guidePixelCount = Math.max(count, 100);
     }
 
     function clearTraceDraw() {
@@ -3191,29 +2997,14 @@
     }
 
     function updateTraceCoverage() {
-      const guideCanvas = $("#trace-guide-canvas");
       const drawCanvas = $("#trace-draw-canvas");
-      if (!guideCanvas || !drawCanvas || guidePixelCount === 0) return;
+      if (!drawCanvas) return;
 
-      const gCtx = guideCanvas.getContext("2d");
-      const dCtx = drawCanvas.getContext("2d");
-      const w = guideCanvas.width;
-      const h = guideCanvas.height;
-
-      const gData = gCtx.getImageData(0, 0, w, h).data;
-      const dData = dCtx.getImageData(0, 0, w, h).data;
-
-      let matched = 0;
-      for (let i = 3; i < gData.length; i += 16) {
-        if (gData[i] > 30 && dData[i] > 30) {
-          matched++;
-        }
-      }
-
-      const percent = Math.min(100, Math.round((matched / guidePixelCount) * 115));
+      const count = traceDrawnPoints.length;
+      const percent = Math.min(100, Math.round((count / 36) * 100));
       $("#trace-progress-badge").textContent = `ความสมบูรณ์ ${percent}%`;
 
-      if (percent >= 60 && !drawCanvas.dataset.awarded) {
+      if (percent >= 100 && !drawCanvas.dataset.awarded) {
         drawCanvas.dataset.awarded = "true";
         handleTraceSuccess();
       }
@@ -3258,8 +3049,7 @@
           video.srcObject = arStream;
           video.style.display = "block";
           container.classList.add("ar-active");
-          $("#trace-feedback").textContent = "📷 โหมด AR: ส่องกล้องเห็นตัวเองแล้วใช้นิ้วลากเส้นกลางอากาศบนจอได้เลย!";
-          renderGuideLetter();
+          $("#trace-feedback").textContent = "📷 โหมด AR: ส่องกล้องเห็นตัวเองแล้วใช้นิ้วลากเส้นกลางอากาศตามรอยได้เลย!";
         } catch (err) {
           console.warn("Camera AR permission or stream error:", err);
           alert("ไม่สามารถเข้าถึงกล้องได้ กรุณาอนุญาตการใช้กล้องเพื่อเล่นโหมด AR");
@@ -3273,8 +3063,7 @@
         video.srcObject = null;
         video.style.display = "none";
         container.classList.remove("ar-active");
-        $("#trace-feedback").textContent = `✍️ ใช้นิ้วลากเส้นตามรอยประตัวอักษร "${traceTarget.l}" ด้านล่างได้เลย!`;
-        renderGuideLetter();
+        $("#trace-feedback").textContent = `✍️ ใช้นิ้วลากเส้นจากจุดสีเขียว 🟢 ไปตามลูกศรจนถึงจุดสีแดง 🔴 (${traceTarget.l} ${traceTarget.w})`;
       }
     }
 
