@@ -2046,6 +2046,8 @@
       if (mode === "drag") newDragSet();
       if (mode === "balloon") startBalloonGame();
       if (mode === "whack") startWhackGame();
+      if (mode === "memory") startMemoryGame();
+      if (mode === "detective") startDetectiveGame();
     }
 
     // --- 7. เกมเจาะลูกโป่งพยัญชนะ (Balloon Pop Game) ---
@@ -2166,14 +2168,12 @@
           sendDesktopNotification("🎈 เก่งมากๆ!", `คุณเจาะลูกโป่งได้คะแนนสะสม ${balloonScore} คะแนนแล้ว`);
         }
 
-        speak(balloonTarget, "ถูกต้อง");
-        setTimeout(startBalloonGame, 1400);
+        setTimeout(startBalloonGame, 850);
       } else {
         AudioSynth.playFailure();
         balloonEl.classList.add("wrong");
         $("#balloon-feedback").textContent = `❌ ยังไม่ใช่จ้า หาตัวอักษร "${balloonTarget.l}"`;
-        speakTextOnly(`ลองอีกครั้ง หาตัวอักษร ${balloonTarget.l}`);
-        setTimeout(() => balloonEl.classList.remove("wrong"), 800);
+        setTimeout(() => balloonEl.classList.remove("wrong"), 700);
       }
     }
 
@@ -2275,14 +2275,12 @@
           sendDesktopNotification("🔨 ตาไวสุดๆ!", `คุณทุบตัวอักษรได้คะแนน ${whackScore} คะแนนแล้ว`);
         }
 
-        speak(whackTarget, "ถูกต้อง");
         stopWhackGame();
-        setTimeout(startWhackGame, 1400);
+        setTimeout(startWhackGame, 850);
       } else {
         AudioSynth.playFailure();
         card.classList.add("miss");
         $("#whack-feedback").textContent = `❌ พลาดไปนิด! ทุบตัวอักษร "${whackTarget.l}" นะ`;
-        speakTextOnly(`ลองอีกครั้ง ทุบตัวอักษร ${whackTarget.l}`);
       }
     }
 
@@ -2419,6 +2417,7 @@
     }
 
     function handleDetectiveChoice(button) {
+      if (!detectiveTarget) return;
       const hitLetter = button.dataset.letter;
       const isCorrect = hitLetter === detectiveTarget.l;
 
@@ -2436,12 +2435,11 @@
           sendDesktopNotification("🎧 หูไวสุดๆ!", `คุณทายเสียงนักสืบได้คะแนนสะสม ${detectiveScore} คะแนนแล้ว`);
         }
 
-        speak(detectiveTarget, "ถูกต้อง");
-        setTimeout(startDetectiveGame, 1500);
+        speak(detectiveTarget);
+        setTimeout(startDetectiveGame, 1300);
       } else {
         AudioSynth.playFailure();
         $("#detective-feedback").textContent = `❌ ยังไม่ใช่จ้า... กดฟังเสียงลับแล้วทายอีกรอบนะ`;
-        speakTextOnly("ลองอีกครั้ง กดฟังเสียงแล้วทายอีกรอบ");
         setTimeout(() => button.classList.remove("wrong"), 1000);
       }
     }
