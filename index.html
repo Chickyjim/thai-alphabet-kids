@@ -1093,17 +1093,17 @@
     .trace-stage-container {
       position: relative;
       width: 100%;
-      max-width: 680px;
-      height: min(480px, 62vh);
+      max-width: 860px;
+      height: min(560px, 75vh);
       margin: 0 auto 16px;
       background: #ffffff;
       background-image: 
         linear-gradient(rgba(124, 92, 255, 0.08) 1px, transparent 1px),
         linear-gradient(90deg, rgba(124, 92, 255, 0.08) 1px, transparent 1px);
-      background-size: 30px 30px;
-      border-radius: 24px;
+      background-size: 32px 32px;
+      border-radius: 26px;
       border: 4px solid var(--line);
-      box-shadow: var(--shadow);
+      box-shadow: 0 16px 36px rgba(36, 48, 68, 0.1);
       overflow: hidden;
       touch-action: none;
       user-select: none;
@@ -1153,16 +1153,17 @@
       position: absolute;
       bottom: 14px;
       right: 14px;
-      background: rgba(36, 48, 68, 0.82);
-      backdrop-filter: blur(6px);
+      background: rgba(36, 48, 68, 0.88);
+      backdrop-filter: blur(8px);
       color: #ffffff;
-      padding: 6px 14px;
+      padding: 8px 18px;
       border-radius: 99px;
-      font-size: 0.95rem;
+      font-size: 1.05rem;
       font-weight: 700;
       z-index: 5;
       pointer-events: none;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
 
     .trace-tools-bar {
@@ -1176,7 +1177,7 @@
       border-radius: 20px;
       border: 2px solid var(--line);
       padding: 12px 18px;
-      max-width: 680px;
+      max-width: 860px;
       margin: 0 auto;
     }
 
@@ -2976,6 +2977,54 @@
       }
     }
 
+    // ข้อมูลจุดเริ่มต้นและลูกศรบอกทิศทางการเขียนพยัญชนะไทยทั้ง 44 ตัว
+    const thaiStrokeData = {
+      "ก": { start: { rx: 0.18, ry: 0.90 }, arrows: [{ rx: 0.20, ry: 0.45, dir: "⬆️", label: "① ลากขึ้น" }, { rx: 0.50, ry: 0.12, dir: "↪️", label: "② ทำปากโค้ง" }, { rx: 0.82, ry: 0.55, dir: "⬇️", label: "③ ลากลง" }] },
+      "ข": { start: { rx: 0.26, ry: 0.22 }, arrows: [{ rx: 0.35, ry: 0.16, dir: "🔄", label: "① ม้วนหัวกลม" }, { rx: 0.22, ry: 0.55, dir: "⬇️", label: "② ลากลง" }, { rx: 0.52, ry: 0.90, dir: "➡️", label: "③ ลากขวา" }, { rx: 0.82, ry: 0.50, dir: "⬆️", label: "④ ลากขึ้น" }] },
+      "ฃ": { start: { rx: 0.26, ry: 0.22 }, arrows: [{ rx: 0.35, ry: 0.14, dir: "〽️", label: "① ม้วนหัวหยัก" }, { rx: 0.22, ry: 0.55, dir: "⬇️", label: "② ลากลง" }, { rx: 0.52, ry: 0.90, dir: "➡️", label: "③ ลากขวา" }, { rx: 0.82, ry: 0.50, dir: "⬆️", label: "④ ลากขึ้น" }] },
+      "ค": { start: { rx: 0.38, ry: 0.26 }, arrows: [{ rx: 0.48, ry: 0.20, dir: "🔄", label: "① ม้วนหัวออก" }, { rx: 0.18, ry: 0.60, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.52, ry: 0.12, dir: "↪️", label: "③ โค้งหลังคา" }, { rx: 0.84, ry: 0.60, dir: "⬇️", label: "④ ลากลง" }] },
+      "ฅ": { start: { rx: 0.38, ry: 0.26 }, arrows: [{ rx: 0.48, ry: 0.20, dir: "🔄", label: "① ม้วนหัวออก" }, { rx: 0.18, ry: 0.60, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.52, ry: 0.12, dir: "〽️", label: "③ หยักหลังคา" }, { rx: 0.84, ry: 0.60, dir: "⬇️", label: "④ ลากลง" }] },
+      "ฆ": { start: { rx: 0.28, ry: 0.24 }, arrows: [{ rx: 0.38, ry: 0.18, dir: "🔄", label: "① ม้วนหัวหยัก" }, { rx: 0.20, ry: 0.60, dir: "⬇️", label: "② ลากลง" }, { rx: 0.55, ry: 0.80, dir: "🔄", label: "③ ม้วนปมล่าง" }, { rx: 0.84, ry: 0.50, dir: "⬆️", label: "④ ลากขึ้น" }] },
+      "ง": { start: { rx: 0.48, ry: 0.22 }, arrows: [{ rx: 0.58, ry: 0.18, dir: "🔄", label: "① ม้วนหัวกลม" }, { rx: 0.48, ry: 0.55, dir: "⬇️", label: "② ลากลงตรง" }, { rx: 0.22, ry: 0.82, dir: "↙️", label: "③ เฉียงหางขึ้นซ้าย" }] },
+      "จ": { start: { rx: 0.48, ry: 0.22 }, arrows: [{ rx: 0.58, ry: 0.18, dir: "🔄", label: "① ม้วนหัวกลม" }, { rx: 0.24, ry: 0.65, dir: "↙️", label: "② ลากลงเฉียง" }, { rx: 0.75, ry: 0.50, dir: "↪️", label: "③ โค้งหลังคาขวา" }] },
+      "ฉ": { start: { rx: 0.30, ry: 0.22 }, arrows: [{ rx: 0.40, ry: 0.18, dir: "🔄", label: "① ม้วนหัวกลม" }, { rx: 0.22, ry: 0.60, dir: "⬇️", label: "② ลากลง" }, { rx: 0.50, ry: 0.84, dir: "🔄", label: "③ ม้วนปมล่าง" }, { rx: 0.80, ry: 0.45, dir: "↪️", label: "④ โค้งปิดบน" }] },
+      "ช": { start: { rx: 0.28, ry: 0.22 }, arrows: [{ rx: 0.38, ry: 0.18, dir: "🔄", label: "① ม้วนหัวกลม" }, { rx: 0.22, ry: 0.58, dir: "⬇️", label: "② ลากลง" }, { rx: 0.50, ry: 0.90, dir: "➡️", label: "③ ลากขวา" }, { rx: 0.80, ry: 0.40, dir: "⬆️", label: "④ ลากขึ้นตวัดหาง" }] },
+      "ซ": { start: { rx: 0.28, ry: 0.22 }, arrows: [{ rx: 0.38, ry: 0.16, dir: "〽️", label: "① ม้วนหัวหยัก" }, { rx: 0.22, ry: 0.58, dir: "⬇️", label: "② ลากลง" }, { rx: 0.50, ry: 0.90, dir: "➡️", label: "③ ลากขวา" }, { rx: 0.80, ry: 0.40, dir: "⬆️", label: "④ ลากขึ้นตวัดหาง" }] },
+      "ฌ": { start: { rx: 0.24, ry: 0.32 }, arrows: [{ rx: 0.32, ry: 0.25, dir: "🔄", label: "① ม้วนหัว" }, { rx: 0.18, ry: 0.65, dir: "⬇️", label: "② ลากลง" }, { rx: 0.52, ry: 0.78, dir: "🔄", label: "③ ผูกปมกลาง" }, { rx: 0.82, ry: 0.45, dir: "⬆️", label: "④ ลากขึ้นขวา" }] },
+      "ญ": { start: { rx: 0.26, ry: 0.32 }, arrows: [{ rx: 0.35, ry: 0.25, dir: "🔄", label: "① ม้วนหัว" }, { rx: 0.18, ry: 0.65, dir: "⬇️", label: "② ลากลง" }, { rx: 0.52, ry: 0.12, dir: "↪️", label: "③ โค้งบน" }, { rx: 0.84, ry: 0.60, dir: "⬇️", label: "④ ลากลงขวา" }] },
+      "ฎ": { start: { rx: 0.38, ry: 0.24 }, arrows: [{ rx: 0.48, ry: 0.18, dir: "🔄", label: "① ม้วนหัวออก" }, { rx: 0.18, ry: 0.55, dir: "⬇️", label: "② ลากลง" }, { rx: 0.52, ry: 0.12, dir: "↪️", label: "③ โค้งบน" }, { rx: 0.82, ry: 0.85, dir: "➰", label: "④ ลากลงม้วนหาง" }] },
+      "ฏ": { start: { rx: 0.38, ry: 0.24 }, arrows: [{ rx: 0.48, ry: 0.18, dir: "🔄", label: "① ม้วนหัวออก" }, { rx: 0.18, ry: 0.55, dir: "⬇️", label: "② ลากลง" }, { rx: 0.52, ry: 0.12, dir: "〽️", label: "③ หลังคาหยัก" }, { rx: 0.82, ry: 0.85, dir: "➰", label: "④ ลากลงม้วนหาง" }] },
+      "ฐ": { start: { rx: 0.30, ry: 0.22 }, arrows: [{ rx: 0.40, ry: 0.18, dir: "🔄", label: "① ม้วนหัว" }, { rx: 0.20, ry: 0.55, dir: "⬇️", label: "② ลากลง" }, { rx: 0.52, ry: 0.12, dir: "↪️", label: "③ โค้งบน" }, { rx: 0.82, ry: 0.60, dir: "⬇️", label: "④ ลากลงขวา" }] },
+      "ฑ": { start: { rx: 0.30, ry: 0.26 }, arrows: [{ rx: 0.40, ry: 0.20, dir: "〽️", label: "① ม้วนหัวหยัก" }, { rx: 0.20, ry: 0.60, dir: "⬇️", label: "② ลากลง" }, { rx: 0.50, ry: 0.12, dir: "↪️", label: "③ โค้งบน" }, { rx: 0.84, ry: 0.60, dir: "⬇️", label: "④ ลากลง" }] },
+      "ฒ": { start: { rx: 0.26, ry: 0.32 }, arrows: [{ rx: 0.34, ry: 0.24, dir: "〽️", label: "① ม้วนหัวหยัก" }, { rx: 0.18, ry: 0.65, dir: "⬇️", label: "② ลากลง" }, { rx: 0.52, ry: 0.78, dir: "🔄", label: "③ ผูกปมกลาง" }, { rx: 0.82, ry: 0.45, dir: "⬆️", label: "④ ลากขึ้นขวา" }] },
+      "ณ": { start: { rx: 0.24, ry: 0.32 }, arrows: [{ rx: 0.34, ry: 0.24, dir: "🔄", label: "① ม้วนหัว" }, { rx: 0.18, ry: 0.65, dir: "⬇️", label: "② ลากลง" }, { rx: 0.52, ry: 0.78, dir: "🔄", label: "③ ผูกปมล่าง" }, { rx: 0.84, ry: 0.45, dir: "⬆️", label: "④ ลากขึ้นขวา" }] },
+      "ด": { start: { rx: 0.42, ry: 0.24 }, arrows: [{ rx: 0.52, ry: 0.18, dir: "🔄", label: "① ม้วนหัวเข้า" }, { rx: 0.22, ry: 0.60, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.52, ry: 0.12, dir: "↪️", label: "③ โค้งหลังคา" }, { rx: 0.84, ry: 0.60, dir: "⬇️", label: "④ ลากลงขวา" }] },
+      "ต": { start: { rx: 0.42, ry: 0.24 }, arrows: [{ rx: 0.52, ry: 0.18, dir: "🔄", label: "① ม้วนหัวเข้า" }, { rx: 0.22, ry: 0.60, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.52, ry: 0.12, dir: "〽️", label: "③ หลังคาหยัก" }, { rx: 0.84, ry: 0.60, dir: "⬇️", label: "④ ลากลงขวา" }] },
+      "ถ": { start: { rx: 0.44, ry: 0.80 }, arrows: [{ rx: 0.52, ry: 0.72, dir: "🔄", label: "① ม้วนหัวล่าง" }, { rx: 0.22, ry: 0.40, dir: "⬆️", label: "② ลากขึ้นซ้าย" }, { rx: 0.50, ry: 0.12, dir: "↪️", label: "③ ทำปากโค้ง" }, { rx: 0.84, ry: 0.60, dir: "⬇️", label: "④ ลากลงขวา" }] },
+      "ท": { start: { rx: 0.38, ry: 0.24 }, arrows: [{ rx: 0.48, ry: 0.18, dir: "🔄", label: "① ม้วนหัวออก" }, { rx: 0.20, ry: 0.60, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.52, ry: 0.12, dir: "↪️", label: "③ โค้งบน" }, { rx: 0.84, ry: 0.60, dir: "⬇️", label: "④ ลากลงขวา" }] },
+      "ธ": { start: { rx: 0.22, ry: 0.88 }, arrows: [{ rx: 0.22, ry: 0.45, dir: "⬆️", label: "① ลากขึ้นตรง" }, { rx: 0.52, ry: 0.12, dir: "↪️", label: "② โค้งบน" }, { rx: 0.82, ry: 0.55, dir: "⬇️", label: "③ ลากลงขวา" }, { rx: 0.52, ry: 0.88, dir: "⬅️", label: "④ ลากฐานล่าง" }] },
+      "น": { start: { rx: 0.26, ry: 0.22 }, arrows: [{ rx: 0.36, ry: 0.18, dir: "🔄", label: "① ม้วนหัวบน" }, { rx: 0.20, ry: 0.60, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.55, ry: 0.82, dir: "🔄", label: "③ ม้วนปมหลัง" }, { rx: 0.82, ry: 0.45, dir: "⬆️", label: "④ ลากขึ้นขวา" }] },
+      "บ": { start: { rx: 0.26, ry: 0.22 }, arrows: [{ rx: 0.36, ry: 0.18, dir: "🔄", label: "① ม้วนหัวกลม" }, { rx: 0.20, ry: 0.60, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.52, ry: 0.90, dir: "➡️", label: "③ ลากฐานล่าง" }, { rx: 0.84, ry: 0.50, dir: "⬆️", label: "④ ลากขึ้นขวา" }] },
+      "ป": { start: { rx: 0.26, ry: 0.32 }, arrows: [{ rx: 0.36, ry: 0.26, dir: "🔄", label: "① ม้วนหัวกลม" }, { rx: 0.20, ry: 0.65, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.52, ry: 0.92, dir: "➡️", label: "③ ลากฐานล่าง" }, { rx: 0.84, ry: 0.25, dir: "⬆️", label: "④ ลากขึ้นหางยาว" }] },
+      "ผ": { start: { rx: 0.30, ry: 0.22 }, arrows: [{ rx: 0.40, ry: 0.18, dir: "🔄", label: "① ม้วนหัวเข้า" }, { rx: 0.20, ry: 0.60, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.50, ry: 0.50, dir: "〽️", label: "③ หยักฟันปลา" }, { rx: 0.84, ry: 0.50, dir: "⬆️", label: "④ ลากขึ้นขวา" }] },
+      "ฝ": { start: { rx: 0.30, ry: 0.32 }, arrows: [{ rx: 0.40, ry: 0.26, dir: "🔄", label: "① ม้วนหัวเข้า" }, { rx: 0.20, ry: 0.65, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.50, ry: 0.55, dir: "〽️", label: "③ หยักฟันปลา" }, { rx: 0.84, ry: 0.25, dir: "⬆️", label: "④ ลากขึ้นหางยาว" }] },
+      "พ": { start: { rx: 0.24, ry: 0.22 }, arrows: [{ rx: 0.34, ry: 0.18, dir: "🔄", label: "① ม้วนหัวออก" }, { rx: 0.18, ry: 0.60, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.50, ry: 0.20, dir: "〽️", label: "③ ลากขึ้น-ลงหยักแหลม" }, { rx: 0.84, ry: 0.50, dir: "⬆️", label: "④ ลากขึ้นขวา" }] },
+      "ฟ": { start: { rx: 0.24, ry: 0.32 }, arrows: [{ rx: 0.34, ry: 0.26, dir: "🔄", label: "① ม้วนหัวออก" }, { rx: 0.18, ry: 0.65, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.50, ry: 0.30, dir: "〽️", label: "③ ลากขึ้น-ลงหยักแหลม" }, { rx: 0.84, ry: 0.22, dir: "⬆️", label: "④ ลากขึ้นหางยาว" }] },
+      "ภ": { start: { rx: 0.42, ry: 0.80 }, arrows: [{ rx: 0.52, ry: 0.72, dir: "🔄", label: "① ม้วนหัวล่าง" }, { rx: 0.20, ry: 0.40, dir: "⬆️", label: "② ลากขึ้นซ้าย" }, { rx: 0.52, ry: 0.12, dir: "↪️", label: "③ โค้งหลังคา" }, { rx: 0.84, ry: 0.60, dir: "⬇️", label: "④ ลากลงขวา" }] },
+      "ม": { start: { rx: 0.26, ry: 0.22 }, arrows: [{ rx: 0.36, ry: 0.18, dir: "🔄", label: "① ม้วนหัวบน" }, { rx: 0.20, ry: 0.60, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.50, ry: 0.78, dir: "🔄", label: "③ ม้วนปมหน้า" }, { rx: 0.82, ry: 0.45, dir: "⬆️", label: "④ ลากขึ้นขวา" }] },
+      "ย": { start: { rx: 0.28, ry: 0.24 }, arrows: [{ rx: 0.38, ry: 0.18, dir: "🔄", label: "① ม้วนหัวบน" }, { rx: 0.20, ry: 0.55, dir: "〽️", label: "② หยักอก" }, { rx: 0.52, ry: 0.90, dir: "➡️", label: "③ ลากฐานล่าง" }, { rx: 0.84, ry: 0.50, dir: "⬆️", label: "④ ลากขึ้นขวา" }] },
+      "ร": { start: { rx: 0.35, ry: 0.78 }, arrows: [{ rx: 0.45, ry: 0.72, dir: "🔄", label: "① ม้วนหัวล่าง" }, { rx: 0.35, ry: 0.35, dir: "⬆️", label: "② ลากขึ้นตรง" }, { rx: 0.65, ry: 0.14, dir: "↪️", label: "③ โค้งหลังคาขวา" }] },
+      "ล": { start: { rx: 0.26, ry: 0.80 }, arrows: [{ rx: 0.36, ry: 0.72, dir: "🔄", label: "① ม้วนหัวล่าง" }, { rx: 0.20, ry: 0.40, dir: "⬆️", label: "② ลากขึ้นซ้าย" }, { rx: 0.52, ry: 0.12, dir: "↪️", label: "③ โค้งบน" }, { rx: 0.84, ry: 0.60, dir: "⬇️", label: "④ ลากลงขวา" }] },
+      "ว": { start: { rx: 0.35, ry: 0.78 }, arrows: [{ rx: 0.45, ry: 0.72, dir: "🔄", label: "① ม้วนหัวล่าง" }, { rx: 0.35, ry: 0.35, dir: "⬆️", label: "② ลากขึ้นตรง" }, { rx: 0.65, ry: 0.14, dir: "↪️", label: "③ โค้งหลังคาซ้าย" }] },
+      "ศ": { start: { rx: 0.38, ry: 0.32 }, arrows: [{ rx: 0.48, ry: 0.26, dir: "🔄", label: "① ม้วนหัวออก" }, { rx: 0.20, ry: 0.65, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.52, ry: 0.18, dir: "↪️", label: "③ โค้งบน" }, { rx: 0.84, ry: 0.18, dir: "↗️", label: "④ ขีดหางชี้ขึ้น" }] },
+      "ษ": { start: { rx: 0.26, ry: 0.24 }, arrows: [{ rx: 0.36, ry: 0.18, dir: "🔄", label: "① ม้วนหัวกลม" }, { rx: 0.20, ry: 0.60, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.52, ry: 0.55, dir: "〽️", label: "③ ขีดไส้กลาง" }, { rx: 0.84, ry: 0.50, dir: "⬆️", label: "④ ลากขึ้นขวา" }] },
+      "ส": { start: { rx: 0.26, ry: 0.80 }, arrows: [{ rx: 0.36, ry: 0.72, dir: "🔄", label: "① ม้วนหัวล่าง" }, { rx: 0.20, ry: 0.40, dir: "⬆️", label: "② ลากขึ้นซ้าย" }, { rx: 0.52, ry: 0.18, dir: "↪️", label: "③ โค้งบน" }, { rx: 0.84, ry: 0.16, dir: "↗️", label: "④ ขีดหางยาว" }] },
+      "ห": { start: { rx: 0.26, ry: 0.22 }, arrows: [{ rx: 0.36, ry: 0.18, dir: "🔄", label: "① ม้วนหัวหน้า" }, { rx: 0.20, ry: 0.60, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.60, ry: 0.24, dir: "🔄", label: "③ ม้วนปมบนขวา" }, { rx: 0.82, ry: 0.65, dir: "⬇️", label: "④ ลากลงขวา" }] },
+      "ฬ": { start: { rx: 0.24, ry: 0.24 }, arrows: [{ rx: 0.34, ry: 0.18, dir: "🔄", label: "① ม้วนหัวออก" }, { rx: 0.18, ry: 0.60, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.50, ry: 0.20, dir: "〽️", label: "③ ลากหยักแหลม" }, { rx: 0.84, ry: 0.16, dir: "➰", label: "④ ลากขึ้นม้วนหาง" }] },
+      "อ": { start: { rx: 0.42, ry: 0.24 }, arrows: [{ rx: 0.52, ry: 0.18, dir: "🔄", label: "① ม้วนหัวบน" }, { rx: 0.22, ry: 0.60, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.52, ry: 0.12, dir: "↪️", label: "③ โค้งหลังคา" }, { rx: 0.84, ry: 0.60, dir: "⬇️", label: "④ ลากลงขวา" }] },
+      "ฮ": { start: { rx: 0.42, ry: 0.28 }, arrows: [{ rx: 0.52, ry: 0.22, dir: "🔄", label: "① ม้วนหัวบน" }, { rx: 0.22, ry: 0.65, dir: "⬇️", label: "② ลากลงซ้าย" }, { rx: 0.52, ry: 0.16, dir: "↪️", label: "③ โค้งหลังคา" }, { rx: 0.84, ry: 0.14, dir: "➰", label: "④ ตวัดม้วนหางบน" }] }
+    };
+
     function renderGuideLetter() {
       const canvas = $("#trace-guide-canvas");
       if (!canvas) return;
@@ -2989,38 +3038,132 @@
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
-      const fontSize = Math.min(w * 0.72, h * 0.76, 320);
+      // ขนาดตัวอักษรใหญ่สะใจเกือบเต็มจอ (88% ของเวที)
+      const fontSize = Math.min(w * 0.88, h * 0.88, 480);
       ctx.font = `bold ${fontSize}px "Sarabun", "Mali", sans-serif`;
 
-      if (isARMode) {
-        ctx.strokeStyle = "rgba(0, 240, 255, 0.9)";
-        ctx.lineWidth = 14;
-        ctx.setLineDash([14, 14]);
-        ctx.shadowColor = "#00f0ff";
-        ctx.shadowBlur = 18;
-        ctx.strokeText(traceTarget.l, w / 2, h / 2 + 10);
+      const cx = w / 2;
+      const cy = h / 2 + 10;
 
-        ctx.fillStyle = "rgba(0, 240, 255, 0.15)";
-        ctx.fillText(traceTarget.l, w / 2, h / 2 + 10);
+      if (isARMode) {
+        // ในโหมด AR: เรืองแสงนีออนสีฟ้าสดใสลอยกลางอากาศ
+        ctx.strokeStyle = "rgba(0, 240, 255, 0.95)";
+        ctx.lineWidth = 18;
+        ctx.setLineDash([16, 16]);
+        ctx.shadowColor = "#00f0ff";
+        ctx.shadowBlur = 22;
+        ctx.strokeText(traceTarget.l, cx, cy);
+
+        ctx.fillStyle = "rgba(0, 240, 255, 0.18)";
+        ctx.fillText(traceTarget.l, cx, cy);
       } else {
+        // ในโหมดจอสัมผัส: เส้นประคมชัดสองชั้นพร้อมพื้นหลังสมุดคัดลายมือ
         ctx.strokeStyle = "#e2e8f0";
-        ctx.lineWidth = 26;
+        ctx.lineWidth = 36;
         ctx.setLineDash([]);
-        ctx.strokeText(traceTarget.l, w / 2, h / 2 + 10);
+        ctx.strokeText(traceTarget.l, cx, cy);
 
         ctx.strokeStyle = "#7c5cff";
-        ctx.lineWidth = 6;
-        ctx.setLineDash([12, 10]);
+        ctx.lineWidth = 8;
+        ctx.setLineDash([16, 14]);
         ctx.shadowColor = "rgba(124, 92, 255, 0.35)";
-        ctx.shadowBlur = 8;
-        ctx.strokeText(traceTarget.l, w / 2, h / 2 + 10);
+        ctx.shadowBlur = 10;
+        ctx.strokeText(traceTarget.l, cx, cy);
 
-        ctx.fillStyle = "rgba(124, 92, 255, 0.06)";
-        ctx.fillText(traceTarget.l, w / 2, h / 2 + 10);
+        ctx.fillStyle = "rgba(124, 92, 255, 0.05)";
+        ctx.fillText(traceTarget.l, cx, cy);
       }
 
       ctx.restore();
+
+      // วาดจุดเริ่มต้น และลูกศรบอกทิศทางการเขียน (Stroke Guides)
+      renderStrokeGuides(ctx, traceTarget.l, cx, cy, fontSize);
+
       calculateGuidePixels();
+    }
+
+    function renderStrokeGuides(ctx, letter, cx, cy, fontSize) {
+      const guide = thaiStrokeData[letter];
+      if (!guide) return;
+
+      const halfW = (fontSize * 0.72) / 2;
+      const halfH = (fontSize * 0.88) / 2;
+      const bx = cx - halfW;
+      const by = cy - halfH;
+
+      ctx.save();
+
+      // 1. วาดลูกศรบอกทิศทางแต่ละสเต็ป (Step Direction Arrows)
+      if (guide.arrows) {
+        guide.arrows.forEach((ar) => {
+          const ax = bx + ar.rx * (halfW * 2);
+          const ay = by + ar.ry * (halfH * 2);
+
+          // ป้ายพื้นหลังลูกศร
+          ctx.beginPath();
+          ctx.arc(ax, ay, 20, 0, Math.PI * 2);
+          ctx.fillStyle = isARMode ? "rgba(17, 24, 39, 0.88)" : "rgba(255, 255, 255, 0.95)";
+          ctx.shadowColor = "rgba(0,0,0,0.25)";
+          ctx.shadowBlur = 6;
+          ctx.fill();
+          ctx.lineWidth = 2.8;
+          ctx.strokeStyle = isARMode ? "#00f0ff" : "#ff9f43";
+          ctx.stroke();
+
+          // ข้อความลูกศรและสัญลักษณ์
+          ctx.font = 'bold 16px "Sarabun", sans-serif';
+          ctx.fillStyle = isARMode ? "#00f0ff" : "#d97706";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(ar.dir, ax, ay);
+        });
+      }
+
+      // 2. วาดจุดเริ่มต้น 🟢 (Numbered Start Point Beacon)
+      if (guide.start) {
+        const sx = bx + guide.start.rx * (halfW * 2);
+        const sy = by + guide.start.ry * (halfH * 2);
+
+        // วงรัศมีระลอกคลื่นเรืองแสง
+        ctx.beginPath();
+        ctx.arc(sx, sy, 26, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(56, 217, 169, 0.35)";
+        ctx.fill();
+
+        // วงกลมจุดเริ่มสีเขียวสด
+        ctx.beginPath();
+        ctx.arc(sx, sy, 18, 0, Math.PI * 2);
+        ctx.fillStyle = "#12b886";
+        ctx.shadowColor = "#12b886";
+        ctx.shadowBlur = 12;
+        ctx.fill();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = "#ffffff";
+        ctx.stroke();
+
+        // สัญลักษณ์ "①" เริ่มต้น
+        ctx.font = 'bold 16px "Sarabun", sans-serif';
+        ctx.fillStyle = "#ffffff";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("①", sx, sy);
+
+        // ป้ายข้อความ "เริ่มตรงนี้"
+        ctx.font = 'bold 13px "Sarabun", sans-serif';
+        const labelText = "เริ่มตรงนี้";
+        const tw = ctx.measureText(labelText).width + 14;
+        
+        ctx.beginPath();
+        ctx.roundRect(sx - tw / 2, sy + 22, tw, 24, 10);
+        ctx.fillStyle = "#12b886";
+        ctx.shadowColor = "rgba(0,0,0,0.2)";
+        ctx.shadowBlur = 4;
+        ctx.fill();
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText(labelText, sx, sy + 34);
+      }
+
+      ctx.restore();
     }
 
     function calculateGuidePixels() {
