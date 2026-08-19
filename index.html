@@ -589,7 +589,33 @@
       box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
     }
 
-    /* 🎈 Balloon Game Styles */
+    /* 🎈 Balloon Game Styles (Enhanced & Beautiful) */
+    .speed-selector {
+      display: inline-flex;
+      background: rgba(0, 0, 0, 0.06);
+      padding: 3px;
+      border-radius: 99px;
+      gap: 3px;
+    }
+
+    .speed-btn {
+      border: none;
+      background: transparent;
+      padding: 4px 12px;
+      border-radius: 99px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .speed-btn.active {
+      background: var(--plum);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(124, 92, 255, 0.35);
+    }
+
     .balloon-prompt, .whack-prompt {
       display: flex;
       align-items: center;
@@ -606,50 +632,124 @@
     .balloon-stage {
       position: relative;
       width: 100%;
-      height: min(420px, 58vh);
-      background: linear-gradient(180deg, #b3e5fc 0%, #e1f5fe 65%, #c8e6c9 100%);
-      border-radius: 24px;
+      height: min(440px, 60vh);
+      background: linear-gradient(180deg, #74c0fc 0%, #bbf2f6 55%, #c3fae8 85%, #8ce99a 100%);
+      border-radius: 28px;
       border: 3px solid var(--line);
       overflow: hidden;
-      box-shadow: var(--shadow);
+      box-shadow: 0 16px 36px rgba(36, 48, 68, 0.12);
       touch-action: manipulation;
+    }
+
+    /* Cartoon Cloud & Hills in Balloon Stage */
+    .balloon-stage::before {
+      content: "";
+      position: absolute;
+      bottom: -10px;
+      left: 0;
+      width: 100%;
+      height: 48px;
+      background: radial-gradient(ellipse at 50% 100%, #51cf66 0%, #40c057 60%, transparent 100%);
+      border-radius: 50% 50% 0 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .stage-cloud {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.75);
+      border-radius: 50px;
+      pointer-events: none;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.04));
+      animation: driftCloud linear infinite;
+    }
+
+    .stage-cloud::before, .stage-cloud::after {
+      content: "";
+      position: absolute;
+      background: inherit;
+      border-radius: 50%;
+    }
+
+    @keyframes driftCloud {
+      from { transform: translateX(-150px); }
+      to { transform: translateX(calc(100vw + 150px)); }
     }
 
     .balloon-item {
       position: absolute;
-      width: min(86px, 20vw);
-      height: min(106px, 25vw);
-      border-radius: 50% 50% 50% 50% / 42% 42% 58% 58%;
+      width: min(92px, 21vw);
+      height: min(114px, 26vw);
+      border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2.8rem;
+      font-size: 3rem;
       font-weight: 700;
       color: #ffffff;
-      text-shadow: 2px 2px 0 rgba(0,0,0,0.25);
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.25), 0 0 12px rgba(255, 255, 255, 0.4);
       cursor: pointer;
-      box-shadow: inset -8px -8px 0 rgba(0,0,0,0.18), 0 10px 20px rgba(0,0,0,0.15);
-      transition: transform 0.15s ease, opacity 0.3s ease;
+      box-shadow: inset -10px -10px 18px rgba(0, 0, 0, 0.2), inset 10px 10px 18px rgba(255, 255, 255, 0.4), 0 12px 24px rgba(0, 0, 0, 0.16);
+      transition: transform 0.15s ease, opacity 0.25s ease;
       user-select: none;
       -webkit-user-select: none;
       z-index: 10;
+      animation: balloonSway 2.4s ease-in-out infinite alternate;
     }
 
+    /* Glossy 3D Highlight on Balloon */
+    .balloon-item::before {
+      content: "";
+      position: absolute;
+      top: 14%;
+      left: 18%;
+      width: 28%;
+      height: 24%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0) 80%);
+      pointer-events: none;
+    }
+
+    /* Balloon Knot & String */
     .balloon-item::after {
       content: "";
       position: absolute;
-      bottom: -14px;
+      bottom: -8px;
       left: 50%;
       transform: translateX(-50%);
+      width: 10px;
+      height: 8px;
+      background: inherit;
+      border-radius: 2px 2px 50% 50%;
+      box-shadow: 0 6px 0 -2px rgba(0,0,0,0.2);
+    }
+
+    .balloon-string {
+      position: absolute;
+      top: 100%;
+      left: 50%;
       width: 2px;
-      height: 18px;
-      background: rgba(0,0,0,0.3);
+      height: 24px;
+      background: rgba(100, 100, 100, 0.35);
+      transform-origin: top center;
+      animation: stringWave 2.4s ease-in-out infinite alternate;
+    }
+
+    @keyframes balloonSway {
+      0% { transform: rotate(-3deg); }
+      100% { transform: rotate(3deg); }
+    }
+
+    @keyframes stringWave {
+      0% { transform: rotate(5deg); }
+      100% { transform: rotate(-5deg); }
     }
 
     .balloon-item.pop {
-      transform: scale(1.6);
+      transform: scale(1.75) rotate(10deg);
       opacity: 0;
       pointer-events: none;
+      filter: blur(2px);
     }
 
     .balloon-item.wrong {
@@ -662,60 +762,114 @@
       75% { transform: translateX(8px) rotate(6deg); }
     }
 
-    /* 🔨 Whack-a-Letter Game Styles */
+    /* 🔨 Whack-a-Letter Game Styles (Enhanced & Beautiful) */
+    .whack-stage-wrapper {
+      background: linear-gradient(180deg, #d8f3dc 0%, #b7e4c7 40%, #95d5b2 100%);
+      border-radius: 28px;
+      border: 3px solid var(--line);
+      padding: 24px 16px;
+      box-shadow: 0 16px 36px rgba(36, 48, 68, 0.1);
+      position: relative;
+    }
+
     .whack-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 18px;
+      gap: 20px;
       max-width: 680px;
       margin: 0 auto;
     }
 
     .mole-hole {
       position: relative;
-      aspect-ratio: 1.15 / 1;
-      background: radial-gradient(ellipse at center, #795548 0%, #4e342e 70%, #3e2723 100%);
-      border-radius: 50% 50% 40% 40% / 60% 60% 40% 40%;
-      border: 4px solid #3e2723;
-      box-shadow: inset 0 10px 22px rgba(0,0,0,0.65), 0 8px 16px rgba(0,0,0,0.15);
+      aspect-ratio: 1.12 / 1;
+      background: radial-gradient(ellipse at 50% 30%, #3e2723 0%, #2b1b17 50%, #5d4037 85%, #8d6e63 100%);
+      border-radius: 50% 50% 45% 45% / 55% 55% 45% 45%;
+      border: 5px solid #4e342e;
+      box-shadow: inset 0 16px 28px rgba(0,0,0,0.85), 0 10px 20px rgba(0,0,0,0.18);
       overflow: hidden;
       cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    /* Grass decoration around hole */
+    .mole-hole::before {
+      content: "🌱";
+      position: absolute;
+      bottom: -2px;
+      left: 6px;
+      font-size: 1.2rem;
+      z-index: 12;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+
+    .mole-hole::after {
+      content: "🌼";
+      position: absolute;
+      bottom: -2px;
+      right: 6px;
+      font-size: 1.1rem;
+      z-index: 12;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
     }
 
     .mole-card {
       position: absolute;
-      bottom: -100%;
-      left: 10%;
-      width: 80%;
-      height: 85%;
-      background: linear-gradient(180deg, #ffecd2 0%, #fcb69f 100%);
-      border: 3px solid #e07a5f;
-      border-radius: 20px 20px 0 0;
+      bottom: -110%;
+      left: 8%;
+      width: 84%;
+      height: 88%;
+      background: linear-gradient(180deg, #fff3b0 0%, #ffdf79 35%, #f4a261 100%);
+      border: 4px solid #e76f51;
+      border-radius: 26px 26px 8px 8px;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-size: 3.4rem;
+      font-size: 3.6rem;
       font-weight: 700;
-      color: #2b2d42;
-      box-shadow: 0 -4px 12px rgba(0,0,0,0.2);
-      transition: bottom 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.2s;
+      color: #264653;
+      text-shadow: 1px 1px 0px rgba(255,255,255,0.8);
+      box-shadow: 0 -6px 16px rgba(0,0,0,0.25);
+      transition: bottom 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.15s ease, background-color 0.2s;
       user-select: none;
       -webkit-user-select: none;
+      z-index: 5;
     }
 
+    /* Cute ears on mole card */
+    .mole-card::before, .mole-card::after {
+      content: "";
+      position: absolute;
+      top: -12px;
+      width: 22px;
+      height: 22px;
+      background: #f4a261;
+      border: 3px solid #e76f51;
+      border-radius: 50%;
+      z-index: -1;
+    }
+
+    .mole-card::before { left: 8px; }
+    .mole-card::after { right: 8px; }
+
     .mole-hole.up .mole-card {
-      bottom: 0;
+      bottom: 2%;
     }
 
     .mole-card.hit {
-      background: #a8e6cf !important;
-      border-color: #2e9d62 !important;
-      transform: scale(1.08);
+      background: linear-gradient(180deg, #d8f3dc 0%, #74c69d 100%) !important;
+      border-color: #2d6a4f !important;
+      color: #1b4332 !important;
+      transform: scale(1.12) rotate(4deg);
+      box-shadow: 0 0 20px #52b788;
     }
 
     .mole-card.miss {
-      background: #ff8b94 !important;
-      border-color: #d64545 !important;
+      background: linear-gradient(180deg, #ffccd5 0%, #ff758f 100%) !important;
+      border-color: #c9184a !important;
+      color: #590d22 !important;
+      animation: shake 0.3s ease;
     }
 
     /* 🧩 Memory Card Game Styles */
@@ -1108,7 +1262,14 @@
       <section id="balloon" class="mode" aria-labelledby="balloon-title">
         <div class="toolbar">
           <h2 id="balloon-title">🎈 เกมเจาะลูกโป่งพยัญชนะ</h2>
-          <div class="score" id="balloon-score">คะแนน 0</div>
+          <div class="actions" style="align-items: center; gap: 10px;">
+            <div class="speed-selector" id="balloon-speed-controls" aria-label="ปรับความเร็ว">
+              <button class="speed-btn" data-speed="slow" type="button" title="ความเร็วช้า">🐢 ช้า</button>
+              <button class="speed-btn active" data-speed="normal" type="button" title="ความเร็วปานกลาง">🐇 ปกติ</button>
+              <button class="speed-btn" data-speed="fast" type="button" title="ความเร็วเร็ว">🚀 ไว</button>
+            </div>
+            <div class="score" id="balloon-score">คะแนน 0</div>
+          </div>
         </div>
         <div class="balloon-prompt">
           <div style="display: flex; align-items: center; gap: 14px;">
@@ -1128,7 +1289,14 @@
       <section id="whack" class="mode" aria-labelledby="whack-title">
         <div class="toolbar">
           <h2 id="whack-title">🔨 เกมทุบตัวอักษรที่โผล่ขึ้นมา</h2>
-          <div class="score" id="whack-score">คะแนน 0</div>
+          <div class="actions" style="align-items: center; gap: 10px;">
+            <div class="speed-selector" id="whack-speed-controls" aria-label="ปรับความเร็ว">
+              <button class="speed-btn" data-speed="slow" type="button" title="ความเร็วช้า">🐢 ช้า</button>
+              <button class="speed-btn active" data-speed="normal" type="button" title="ความเร็วปานกลาง">🐇 ปกติ</button>
+              <button class="speed-btn" data-speed="fast" type="button" title="ความเร็วเร็ว">🚀 ไว</button>
+            </div>
+            <div class="score" id="whack-score">คะแนน 0</div>
+          </div>
         </div>
         <div class="whack-prompt">
           <div style="display: flex; align-items: center; gap: 14px;">
@@ -1141,13 +1309,15 @@
           <button class="btn primary" id="speak-whack-prompt" type="button">🔊 ฟังโจทย์</button>
         </div>
         <div id="whack-feedback" style="text-align: center; font-weight: 700; font-size: 1.2rem; min-height: 28px; margin-bottom: 10px; color: var(--plum);"></div>
-        <div class="whack-grid" id="whack-grid">
-          <div class="mole-hole" data-hole="0"><div class="mole-card">ก</div></div>
-          <div class="mole-hole" data-hole="1"><div class="mole-card">ข</div></div>
-          <div class="mole-hole" data-hole="2"><div class="mole-card">ค</div></div>
-          <div class="mole-hole" data-hole="3"><div class="mole-card">ง</div></div>
-          <div class="mole-hole" data-hole="4"><div class="mole-card">จ</div></div>
-          <div class="mole-hole" data-hole="5"><div class="mole-card">ฉ</div></div>
+        <div class="whack-stage-wrapper">
+          <div class="whack-grid" id="whack-grid">
+            <div class="mole-hole" data-hole="0"><div class="mole-card">ก</div></div>
+            <div class="mole-hole" data-hole="1"><div class="mole-card">ข</div></div>
+            <div class="mole-hole" data-hole="2"><div class="mole-card">ค</div></div>
+            <div class="mole-hole" data-hole="3"><div class="mole-card">ง</div></div>
+            <div class="mole-hole" data-hole="4"><div class="mole-card">จ</div></div>
+            <div class="mole-hole" data-hole="5"><div class="mole-card">ฉ</div></div>
+          </div>
         </div>
       </section>
 
@@ -1883,7 +2053,8 @@
     let balloonScore = 0;
     let balloonAnimId = null;
     let activeBalloons = [];
-    const balloonColors = ["#ff7aa8", "#7c5cff", "#ff9f43", "#4caf82", "#76b7f2", "#ffd166"];
+    let balloonSpeedMultiplier = 1.0; // 0.65 (ช้า), 1.0 (ปกติ), 1.6 (ไว)
+    const balloonColors = ["#ff6b8b", "#7c5cff", "#ff9f43", "#2ec4b6", "#48cae4", "#ffd166", "#845ec2"];
 
     function stopBalloonGame() {
       if (balloonAnimId) {
@@ -1893,6 +2064,24 @@
       activeBalloons = [];
       const stage = $("#balloon-stage");
       if (stage) stage.innerHTML = "";
+    }
+
+    function createBalloonClouds(stage) {
+      const cloudsData = [
+        { top: 15, w: 90, h: 32, dur: 18, delay: 0 },
+        { top: 90, w: 120, h: 42, dur: 25, delay: -8 },
+        { top: 180, w: 80, h: 28, dur: 21, delay: -14 }
+      ];
+      cloudsData.forEach((c) => {
+        const cloud = document.createElement("div");
+        cloud.className = "stage-cloud";
+        cloud.style.top = `${c.top}px`;
+        cloud.style.width = `${c.w}px`;
+        cloud.style.height = `${c.h}px`;
+        cloud.style.animationDuration = `${c.dur}s`;
+        cloud.style.animationDelay = `${c.delay}s`;
+        stage.appendChild(cloud);
+      });
     }
 
     function startBalloonGame() {
@@ -1911,6 +2100,8 @@
       if (!stage) return;
       stage.innerHTML = "";
 
+      createBalloonClouds(stage);
+
       const stageWidth = stage.clientWidth || 600;
       const colWidth = stageWidth / 4;
 
@@ -1921,26 +2112,34 @@
         balloon.textContent = item.l;
         balloon.dataset.letter = item.l;
         
-        const x = idx * colWidth + Math.random() * (colWidth - 84);
-        const y = Math.random() * -150 - 50;
-        const speed = 1.2 + Math.random() * 0.8;
+        // สายลูกโป่ง
+        const stringEl = document.createElement("div");
+        stringEl.className = "balloon-string";
+        balloon.appendChild(stringEl);
 
-        balloon.style.left = `${Math.max(10, x)}px`;
+        const x = idx * colWidth + Math.random() * Math.max(10, colWidth - 95);
+        const y = Math.random() * -140 - 60;
+        const baseSpeed = (1.2 + Math.random() * 0.8) * balloonSpeedMultiplier;
+
+        balloon.style.left = `${Math.max(12, x)}px`;
         balloon.style.bottom = `${y}px`;
 
         balloon.addEventListener("click", () => handleBalloonClick(balloon, item));
         stage.appendChild(balloon);
 
-        return { element: balloon, x, y, speed, item };
+        return { element: balloon, x, y, speed: baseSpeed, item };
       });
 
       function animate() {
-        const stageHeight = stage.clientHeight || 380;
+        const stageHeight = stage.clientHeight || 420;
         activeBalloons.forEach((b) => {
           if (b.element.classList.contains("pop")) return;
           b.y += b.speed;
-          if (b.y > stageHeight + 100) {
-            b.y = -120;
+          if (b.y > stageHeight + 120) {
+            b.y = -130;
+            const newX = Math.random() * (stageWidth - 100) + 10;
+            b.x = newX;
+            b.element.style.left = `${newX}px`;
           }
           b.element.style.bottom = `${b.y}px`;
         });
@@ -1957,7 +2156,7 @@
         balloonEl.classList.add("pop");
         AudioSynth.playPop();
         AudioSynth.playSuccess();
-        Confetti.spawn(40);
+        Confetti.spawn(45);
 
         balloonScore += 1;
         $("#balloon-score").textContent = `คะแนน ${balloonScore}`;
@@ -1983,6 +2182,13 @@
     let whackScore = 0;
     let whackTimer = null;
     let isWhackActive = false;
+    let whackSpeedMode = "normal"; // slow, normal, fast
+
+    function getWhackTimings() {
+      if (whackSpeedMode === "slow") return { interval: 2800, active: 2200 };
+      if (whackSpeedMode === "fast") return { interval: 1300, active: 900 };
+      return { interval: 1950, active: 1450 }; // normal
+    }
 
     function stopWhackGame() {
       if (whackTimer) {
@@ -2003,8 +2209,9 @@
 
       speak(whackTarget);
 
+      const timings = getWhackTimings();
       popMoles();
-      whackTimer = setInterval(popMoles, 2000);
+      whackTimer = setInterval(popMoles, timings.interval);
     }
 
     function popMoles() {
@@ -2015,6 +2222,8 @@
       const targetHoleIdx = Math.floor(Math.random() * holes.length);
       const distractors = shuffle(letters.filter(item => item !== whackTarget)).slice(0, 5);
       let distractorIdx = 0;
+
+      const timings = getWhackTimings();
 
       holes.forEach((hole, idx) => {
         const card = hole.querySelector(".mole-card");
@@ -2033,7 +2242,14 @@
           
           setTimeout(() => {
             if (isWhackActive) hole.classList.add("up");
-          }, idx * 50);
+          }, idx * 40);
+
+          // อัตโนมัติมุดลงหลุมเมื่อหมดเวลาของความเร็วที่เลือก
+          setTimeout(() => {
+            if (isWhackActive && !card.classList.contains("hit")) {
+              hole.classList.remove("up");
+            }
+          }, timings.active);
         }
       });
     }
@@ -2046,11 +2262,10 @@
       const hitLetter = card.dataset.letter;
 
       if (hitLetter === whackTarget.l) {
-        hole.classList.remove("up");
         card.classList.add("hit");
         AudioSynth.playWhack();
         AudioSynth.playSuccess();
-        Confetti.spawn(40);
+        Confetti.spawn(45);
 
         whackScore += 1;
         $("#whack-score").textContent = `คะแนน ${whackScore}`;
@@ -2233,6 +2448,34 @@
 
     // --- 11. การผูกเหตุการณ์และเริ่มต้นการทำงาน ---
     $$(".mole-hole").forEach((hole) => hole.addEventListener("click", () => handleWhackClick(hole)));
+    
+    // ผูกเหตุการณ์ปุ่มปรับความเร็วของเกมเจาะลูกโป่ง
+    $$("#balloon-speed-controls .speed-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        $$("#balloon-speed-controls .speed-btn").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        const speed = btn.dataset.speed;
+        if (speed === "slow") balloonSpeedMultiplier = 0.65;
+        else if (speed === "fast") balloonSpeedMultiplier = 1.65;
+        else balloonSpeedMultiplier = 1.0;
+        AudioSynth.init();
+        AudioSynth.playTone(550, 0.06, "sine");
+        startBalloonGame();
+      });
+    });
+
+    // ผูกเหตุการณ์ปุ่มปรับความเร็วของเกมทุบตัวอักษร
+    $$("#whack-speed-controls .speed-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        $$("#whack-speed-controls .speed-btn").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        whackSpeedMode = btn.dataset.speed;
+        AudioSynth.init();
+        AudioSynth.playTone(550, 0.06, "sine");
+        startWhackGame();
+      });
+    });
+
     $("#speak-balloon-prompt").addEventListener("click", () => {
       AudioSynth.init();
       if (balloonTarget) speak(balloonTarget);
